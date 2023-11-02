@@ -584,7 +584,7 @@ def app():
     # nprim = "res/nprims/nprim162.prm" # stopsign
     # nprim = "res/nprims/nprim143.prm" # gun
     # nprim = "res/nprims/nprim036.prm" #
-    single_nprm = True
+    single_nprm = False
     # calc_uvs(105, 47, 98, 38, 119, 47, 126, 38)
     if single_nprm:
         [df, df_points, df_quadrangles, df_triangles] = fill_dataframe_with_nprim_data(nprim, df)
