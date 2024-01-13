@@ -1,0 +1,3 @@
+pandas==1.4.2
+pandastable==0.13.0
+numpy==1.22.3

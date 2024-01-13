@@ -27,7 +27,7 @@ def user_input(nprim_modifier):
     nprim_modifier.new_first_quad_id = 26000
     nprim_modifier.new_first_triangle_id = 25000
 
-    nprim_modifier.nprim_output_filename = 'nprim200.prm'
+    nprim_modifier.nprim_output_filename = 'nprim150.prm'
     nprim_modifier.nprim_output_path = 'output/modified_nprims/' + nprim_modifier.nprim_output_filename
     # nprim_modifier.nprim_output_path = 'output/modified_nprims/test_cube.prm'
 
@@ -264,17 +264,16 @@ def app():
 
     # nprim = "res/nprims/nprim216.prm"
     # nprim = "res/nprims/nprim150.prm"  # police car
-    nprim = "res/nprims/" + nprim_modifier.nprim_output_filename  # knife
+    nprim = "res/nprims/" + nprim_modifier.nprim_output_filename
     [df, df_points, df_quadrangles, df_triangles] = fill_dataframe_with_nprim_data(nprim, df)
 
     # user defined obj
-    [df_points, df_triangles, df_quadrangles] = extract_obj_to_df("res/objs/baby_yoda.obj")
+    [df_points, df_triangles, df_quadrangles] = extract_obj_to_df("res/objs/test_uv_cube.obj")
 
     triangle_faces_count = faces_count(df_triangles)
     quadrangle_faces_count = faces_count(df_quadrangles)
 
     adjust_datatypes_in_dataframes(df, df_points, df_triangles, df_quadrangles)
-    # adjust_name_to_32bytes(df)
     points_count = get_points_count(df_points)
 
     # This seems redundant now
@@ -287,11 +286,6 @@ def app():
     adjust_datatypes_in_dataframes(df, df_points, df_triangles, df_quadrangles)
 
     create_nprim_from_dataframes(nprim_modifier.nprim_output_path, df, df_points, df_quadrangles, df_triangles)
-
-    # for i, filename in enumerate(glob.iglob(f'{sc_game_dir}/nprim*.prm')):
-    #     shutil.copyfile(nprim_modifier.nprim_output_path, filename)
-    #     if i > 79:
-    #         break
 
     shutil.copyfile(nprim_modifier.nprim_output_path, dst_file)
 
