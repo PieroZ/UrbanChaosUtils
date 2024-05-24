@@ -6,15 +6,18 @@ import glob
 import time
 import math
 
+
 def list_obj_files(directory):
     # Use glob to find all .obj files in the given directory
     obj_files = glob.glob(os.path.join(directory, '*.obj'))
     return obj_files
 
+
 def read_json_to_dict(json_file_path):
     with open(json_file_path, 'r') as file:
         data = json.load(file)
     return data
+
 
 def clear_scene():
     # Deselect all objects
@@ -30,11 +33,12 @@ def clear_scene():
 
     print("All mesh objects have been removed from the scene.")
 
+
 def import_obj(obj_path):
     file_loc = obj_path
     # Extract the name of the object from the file name
     obj_name = os.path.splitext(os.path.basename(file_loc))[0]
-    
+
     # Check if an object with the same name already exists
     if obj_name in bpy.data.objects:
         bpy.data.objects[obj_name].select_set(True)
@@ -42,35 +46,56 @@ def import_obj(obj_path):
 
     # Check if mesh should be ignored
     ignored_list = ["rhand01", "rhand03", "rhand04", "rhand06", "rhand07", "lhand01", "lhand02"]
-    
+
     if obj_name not in ignored_list:
-    
         # Import the object
         bpy.ops.import_scene.obj(filepath=file_loc)
-        
+
         # Rename the imported object
         imported_object = bpy.context.selected_objects[0]
         imported_object.name = obj_name
-        
+
         print('Imported name: ', imported_object.name)
-        
+
+
 def euler_to_degrees(euler):
     # Convert Euler angles from radians to degrees
     return [math.degrees(angle) for angle in euler]
-        
+
+
 def degrees_to_matrix(x_deg, y_deg, z_deg):
     # Convert degrees to radians
     x_rad = math.radians(x_deg)
     y_rad = math.radians(y_deg)
     z_rad = math.radians(z_deg)
-    
+
     # Create an Euler object from the radians
     euler = mathutils.Euler((x_rad, y_rad, z_rad), 'XYZ')
-    
+
     # Convert the Euler object to a 3x3 rotation matrix
     rotation_matrix = euler.to_matrix()
-    
+
     return rotation_matrix
+
+
+def vue_translation_vector(x, y, z):
+    print(f'vue_x arg = {x}')
+    offset_x = x - 1
+    vue_x = (offset_x * 100) / 256
+
+    offset_y = y - 2
+    vue_y = (offset_y * 100) / 256
+
+    offset_z = z + 136
+    vue_z = (offset_z * 100) / 256
+
+    return [vue_x, vue_y, vue_z]
+
+
+def order_vue_angles(angles):
+    return [angles[0][0][0], angles[0][2][0], angles[0][1][0], angles[0][0][2], angles[0][2][2], angles[0][1][2],
+            angles[0][0][1], angles[0][2][1], angles[0][1][1]]
+
 
 def app(file_no):
     base_obj_directory = 'C:/dev/workspaces/python/urban chaos research/output/all-obj/roper/0/'
@@ -78,10 +103,10 @@ def app(file_no):
     clear_scene()
     for obj in obj_list:
         import_obj(obj)
-        
+
     # Deselect all objects
     bpy.ops.object.select_all(action='DESELECT')
-    
+
     print(f'app called with = {file_no}')
     # Path to your JSON file
     rotation_json_file_path = f'C:/dev/workspaces/python/urban chaos research/output/body-part-offsets/roper/rotation_matrix_frame {file_no}.json'
@@ -91,7 +116,7 @@ def app(file_no):
 
     # Print the dictionary to verify
     print(rotation_dict)
-    
+
     translation_json_file_path = f'C:/dev/workspaces/python/urban chaos research/output/body-part-offsets/roper/frame {file_no}.txt'
     # Read the text file and store it in a dictionary
     transform_dict = read_json_to_dict(translation_json_file_path)
@@ -109,7 +134,7 @@ def app(file_no):
         if key in bpy.data.objects:
             # Get the mesh object
             obj = bpy.data.objects[key]
-            
+
             # Select the object and set it as the active object
             bpy.context.view_layer.objects.active = obj
             obj.select_set(True)
@@ -121,11 +146,11 @@ def app(file_no):
             obj.rotation_euler = matrix.to_euler('XYZ')
 
             print(obj.rotation_euler)
-            
-            
+
             euler_angles_degrees = euler_to_degrees(obj.rotation_euler)
-            
-            rotation_matrix = degrees_to_matrix(euler_angles_degrees[0],euler_angles_degrees[1],euler_angles_degrees[2])
+
+            rotation_matrix = degrees_to_matrix(euler_angles_degrees[0], euler_angles_degrees[1],
+                                                euler_angles_degrees[2])
             print(rotation_matrix)
 
             # Get the translation vector and set object location
@@ -135,12 +160,19 @@ def app(file_no):
                 transform_dict[key][2]
             ))
             obj.location = translation_vector
-            
+
+            vue_x, vue_y, vue_z = vue_translation_vector(obj.location[0], obj.location[1], obj.location[2])
+            ordered_vue_xyz = order_vue_angles(value)
+            print(f'vue x = {vue_x}, vue y = {vue_y}, vue z = {vue_z}')
+            print(
+                f'ordered vue x = {ordered_vue_xyz[0]},{ordered_vue_xyz[1]},{ordered_vue_xyz[2]},{ordered_vue_xyz[3]},{ordered_vue_xyz[4]},{ordered_vue_xyz[5]},{ordered_vue_xyz[6]},{ordered_vue_xyz[7]},{ordered_vue_xyz[8]}')
+
             obj.select_set(False)
         else:
             print(f"Object {key} not found in the scene.")
 
+
 # Test the function
 if __name__ == '__main__':
-    file_no = 0  # Set this to the desired file number
+    file_no = 4  # Set this to the desired file number
     app(file_no)
