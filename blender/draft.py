@@ -4,6 +4,7 @@ import json
 import os
 import glob
 import time
+import math
 
 def list_obj_files(directory):
     # Use glob to find all .obj files in the given directory
@@ -52,6 +53,24 @@ def import_obj(obj_path):
         imported_object.name = obj_name
         
         print('Imported name: ', imported_object.name)
+        
+def euler_to_degrees(euler):
+    # Convert Euler angles from radians to degrees
+    return [math.degrees(angle) for angle in euler]
+        
+def degrees_to_matrix(x_deg, y_deg, z_deg):
+    # Convert degrees to radians
+    x_rad = math.radians(x_deg)
+    y_rad = math.radians(y_deg)
+    z_rad = math.radians(z_deg)
+    
+    # Create an Euler object from the radians
+    euler = mathutils.Euler((x_rad, y_rad, z_rad), 'XYZ')
+    
+    # Convert the Euler object to a 3x3 rotation matrix
+    rotation_matrix = euler.to_matrix()
+    
+    return rotation_matrix
 
 def app(file_no):
     base_obj_directory = 'C:/dev/workspaces/python/urban chaos research/output/all-obj/roper/0/'
@@ -100,6 +119,14 @@ def app(file_no):
 
             # Convert matrix to Euler rotation and set object rotation
             obj.rotation_euler = matrix.to_euler('XYZ')
+
+            print(obj.rotation_euler)
+            
+            
+            euler_angles_degrees = euler_to_degrees(obj.rotation_euler)
+            
+            rotation_matrix = degrees_to_matrix(euler_angles_degrees[0],euler_angles_degrees[1],euler_angles_degrees[2])
+            print(rotation_matrix)
 
             # Get the translation vector and set object location
             translation_vector = mathutils.Vector((
