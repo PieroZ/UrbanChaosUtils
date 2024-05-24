@@ -31,8 +31,8 @@ def clear_scene():
     # Delete all selected objects
     bpy.ops.object.delete()
 
-    print("All mesh objects have been removed from the scene.")
 
+#    print("All mesh objects have been removed from the scene.")
 
 def import_obj(obj_path):
     file_loc = obj_path
@@ -55,8 +55,8 @@ def import_obj(obj_path):
         imported_object = bpy.context.selected_objects[0]
         imported_object.name = obj_name
 
-        print('Imported name: ', imported_object.name)
 
+#        print('Imported name: ', imported_object.name)
 
 def euler_to_degrees(euler):
     # Convert Euler angles from radians to degrees
@@ -79,7 +79,7 @@ def degrees_to_matrix(x_deg, y_deg, z_deg):
 
 
 def vue_translation_vector(x, y, z):
-    print(f'vue_x arg = {x}')
+    #    print(f'vue_x arg = {x}')
     offset_x = x - 1
     vue_x = (offset_x * 100) / 256
 
@@ -107,7 +107,7 @@ def app(file_no):
     # Deselect all objects
     bpy.ops.object.select_all(action='DESELECT')
 
-    print(f'app called with = {file_no}')
+    print(f'frame {file_no}')
     # Path to your JSON file
     rotation_json_file_path = f'C:/dev/workspaces/python/urban chaos research/output/body-part-offsets/roper/rotation_matrix_frame {file_no}.json'
 
@@ -115,15 +115,15 @@ def app(file_no):
     rotation_dict = read_json_to_dict(rotation_json_file_path)
 
     # Print the dictionary to verify
-    print(rotation_dict)
+    #    print(rotation_dict)
 
     translation_json_file_path = f'C:/dev/workspaces/python/urban chaos research/output/body-part-offsets/roper/frame {file_no}.txt'
     # Read the text file and store it in a dictionary
     transform_dict = read_json_to_dict(translation_json_file_path)
 
     for key, value in rotation_dict.items():
-        print(key)
-        print(value[0][1])
+        #        print(key)
+        #        print(value[0][1])
         matrix = mathutils.Matrix((
             value[0][0],
             value[0][1],
@@ -145,13 +145,13 @@ def app(file_no):
             # Convert matrix to Euler rotation and set object rotation
             obj.rotation_euler = matrix.to_euler('XYZ')
 
-            print(obj.rotation_euler)
+            #            print(obj.rotation_euler)
 
             euler_angles_degrees = euler_to_degrees(obj.rotation_euler)
 
             rotation_matrix = degrees_to_matrix(euler_angles_degrees[0], euler_angles_degrees[1],
                                                 euler_angles_degrees[2])
-            print(rotation_matrix)
+            #            print(rotation_matrix)
 
             # Get the translation vector and set object location
             translation_vector = mathutils.Vector((
@@ -163,9 +163,12 @@ def app(file_no):
 
             vue_x, vue_y, vue_z = vue_translation_vector(obj.location[0], obj.location[1], obj.location[2])
             ordered_vue_xyz = order_vue_angles(value)
-            print(f'vue x = {vue_x}, vue y = {vue_y}, vue z = {vue_z}')
-            print(
-                f'ordered vue x = {ordered_vue_xyz[0]},{ordered_vue_xyz[1]},{ordered_vue_xyz[2]},{ordered_vue_xyz[3]},{ordered_vue_xyz[4]},{ordered_vue_xyz[5]},{ordered_vue_xyz[6]},{ordered_vue_xyz[7]},{ordered_vue_xyz[8]}')
+            #            print(f'vue x = {vue_x}, vue y = {vue_y}, vue z = {vue_z}')
+            #            print(f'ordered vue x = {ordered_vue_xyz[0]},{ordered_vue_xyz[1]},{ordered_vue_xyz[2]},{ordered_vue_xyz[3]},{ordered_vue_xyz[4]},{ordered_vue_xyz[5]},{ordered_vue_xyz[6]},{ordered_vue_xyz[7]},{ordered_vue_xyz[8]}')
+
+            vue_entry = f'transform "{key}" {ordered_vue_xyz[0]:.3f} {ordered_vue_xyz[1]:.3f} {ordered_vue_xyz[2]:.3f} {ordered_vue_xyz[3]:.3f} {ordered_vue_xyz[4]:.3f} {ordered_vue_xyz[5]:.3f} {ordered_vue_xyz[6]:.3f} {ordered_vue_xyz[7]:.3f} {ordered_vue_xyz[8]:.3f} {vue_x:.3f} {vue_z:.3f} {vue_y:.3f}'
+
+            print(vue_entry)
 
             obj.select_set(False)
         else:
@@ -174,5 +177,5 @@ def app(file_no):
 
 # Test the function
 if __name__ == '__main__':
-    file_no = 4  # Set this to the desired file number
+    file_no = 413  # Set this to the desired file number
     app(file_no)
