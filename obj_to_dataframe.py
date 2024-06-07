@@ -16,12 +16,13 @@ def grab_dst_textures(obj_filepath):
 
 
 def extract_texture_number_from_texture_filename(texture_filename):
-    return int(texture_filename[-9:-6])
-    # return int(texture_filename[-10:-7])
+    # return int(texture_filename[-9:-6])
+    return int(texture_filename[-10:-7])
 
 
 def calculate_texture_page_and_uv_offsets(texture_file_number):
     page = texture_file_number + 64 * 11
+    # page = texture_file_number + 64 * 10
     texture_page = int(page / 64)
     base_page = (texture_page - 11) * 64
     remainder = texture_file_number - base_page
@@ -264,7 +265,7 @@ def extract_faces(obj_file_content, uv_list, mtl_offsets_dict):
     quadrangles_dict = {
         # "texture_id_group": [texture_page] * len(quadrangle_a_list),
         "texture_id_group": quadrangle_texture_page_list,
-        "properties": [2] * len(quadrangle_a_list),
+        "properties": [3] * len(quadrangle_a_list),
         "point_a_id": quadrangle_b_list,
         "point_b_id": quadrangle_a_list,
         "point_c_id": quadrangle_d_list,
@@ -290,12 +291,13 @@ def extract_faces(obj_file_content, uv_list, mtl_offsets_dict):
         # "v_c": quadrangle_v_c_list,
         # "u_d": quadrangle_u_d_list,
         # "v_d": quadrangle_v_d_list,
-        "bright_a": [64] * len(quadrangle_a_list),
+        "bright_a": [0] * len(quadrangle_a_list),
         "bright_b": [0] * len(quadrangle_a_list),
-        "bright_c": [64] * len(quadrangle_a_list),
+        "bright_c": [0] * len(quadrangle_a_list),
         "bright_d": [0] * len(quadrangle_a_list),
         "thing_index": [0] * len(quadrangle_a_list),
-        "col2": [64] * len(quadrangle_a_list),
+        # "col2": [64] * len(quadrangle_a_list),
+        "col2": [143] * len(quadrangle_a_list),
         "face_flags": [0] * len(quadrangle_a_list),
         "type": [0] * len(quadrangle_a_list),
         "id": [0] * len(quadrangle_a_list)
@@ -306,7 +308,7 @@ def extract_faces(obj_file_content, uv_list, mtl_offsets_dict):
     triangles_dict = {
         # "texture_id_group": [texture_page] * len(triangle_a_list),
         "texture_id_group": triangle_texture_page_list,
-        "properties": [2] * len(triangle_a_list),
+        "properties": [3] * len(triangle_a_list),
         "point_a_id": triangle_c_list,
         "point_b_id": triangle_b_list,
         "point_c_id": triangle_a_list,
@@ -327,8 +329,9 @@ def extract_faces(obj_file_content, uv_list, mtl_offsets_dict):
         "bright_b": [0] * len(triangle_a_list),
         "bright_c": [0] * len(triangle_a_list),
         "thing_index": [0] * len(triangle_a_list),
-        "col2": [0] * len(triangle_a_list),
-        "face_flags": [61696] * len(triangle_a_list),
+        # "col2": [0] * len(triangle_a_list),
+        "col2": [143] * len(triangle_a_list),
+        "face_flags": [0] * len(triangle_a_list),
         "type": [0] * len(triangle_a_list),
         "id": [0] * len(triangle_a_list)
     }
