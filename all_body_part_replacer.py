@@ -1,6 +1,7 @@
 import numpy as np
 from obj_to_dataframe import *
 import struct
+import shutil
 
 
 def find_2byte_integer_in_bytearray(byte_array, value):
@@ -529,9 +530,9 @@ def prepare_binary_data(df_points, df_quadrangles, df_triangles, previous_meta_d
         binary_data.extend(df_quadrangles['type'][index].tobytes())
         binary_data.extend(df_quadrangles['id'][index].tobytes())
 
-        # padding
-        for i in range(4):
-            binary_data.extend("\0".encode('utf-8'))
+        # # padding
+        # for i in range(4):
+        #     binary_data.extend("\0".encode('utf-8'))
 
     points_delta = e0 - previous_meta_data.e0
     triangles_delta = ef3 - previous_meta_data.ef3
@@ -649,11 +650,22 @@ def prim_count(cursor, binary_data):
     return [cursor, prims_count]
 
 
-def app():
-    input_all_filename = "roper.all"
-    # input_obj = "res/objs/gta3_skull.obj"
-    input_obj = "res/objs/hostage_skull.obj"
-    body_part_name = "skull00"
+def app(input_all_filename, input_obj, body_part_name, scale=1):
+    # input_all_filename = "darci1.all"
+    # input_obj = "res/objs/rhumerus_gta3.obj"
+    # input_obj = "res/objs/ltibia_gta3.obj"
+    # input_obj = "res/objs/SKULL3.obj"
+
+    # input_obj = "res/objs/torso_gta3.obj"
+    # input_obj = "res/objs/ShrekLowPoly.obj"
+    # input_obj = "res/objs/hostage_skull.obj"
+    # input_obj = "res/objs/Ayaya.obj"
+    # input_obj = "res/objs/roper_kaonashi_mask.obj"
+    # body_part_name = "lhumorus00"
+    # body_part_name = "ltibia00"
+    # body_part_name = "torso00"
+    # body_part_name = "ltibia00"
+
     binary_data = read_nprim("res/all/" + input_all_filename)
     found_at = search_in_binary(binary_data, body_part_name)
 
@@ -686,7 +698,7 @@ def app():
 
 
     #
-    [df_points, df_triangles, df_quadrangles] = extract_obj_to_df(input_obj)
+    [df_points, df_triangles, df_quadrangles] = extract_obj_to_df(input_obj, scale)
     #
     # triangle_faces_count = faces_count(df_triangles)
     # quadrangle_faces_count = faces_count(df_quadrangles)
@@ -696,6 +708,7 @@ def app():
     [new_binary_body_part, points_delta, triangles_delta, quadrangles_delta] = prepare_binary_data(df_points, df_quadrangles, df_triangles, modified_body_part)
 
     # value_to_find = 9977
+    # value_to_find = 5606
     #
     # index = find_2byte_integer_in_bytearray(new_binary_body_part, value_to_find)
     # if index != -1:
@@ -735,6 +748,16 @@ def app():
     with open(input_all_filename, 'wb') as file:
         file.write(new_binary_data)
 
+    sc_game_dir = 'C:/dev/workspaces/repo clones/Clean-UrbanChaos/MuckyFoot-UrbanChaos/fallen/Release/data/'
+
+    dst_file = sc_game_dir + input_all_filename
+
+    shutil.copyfile(input_all_filename, dst_file)
+
+    res_input_file_path = "res/all/" + input_all_filename
+
+    shutil.copyfile(input_all_filename, res_input_file_path)
+
 
 def app2():
     input_all_filename = "roper.all"
@@ -749,5 +772,25 @@ def app2():
             convert_nprim_binary_to_readable_data(cursor, 0, binary_data)
 
 
+def apply_multiple_body_parts():
+    input_all_filename = "darci1.all"
+
+    input_dict = {"skull_gta3.obj": "skull00",
+                  "torso_gta3.obj": "torso00",
+                  "pelvis_gta3.obj": "pelvis00",
+                  }
+
+    scale_dict = {"skull_gta3.obj": 0.7,
+                  "torso_gta3.obj": 1.0,
+                  "pelvis_gta3.obj": 1.0,
+                  }
+
+    for key, value in input_dict.items():
+        input_obj = f'res/objs/{key}'
+        body_part_name = value
+        scale = scale_dict[key]
+        app(input_all_filename, input_obj, body_part_name, scale)
+
+
 if __name__ == '__main__':
-    app()
+    apply_multiple_body_parts()

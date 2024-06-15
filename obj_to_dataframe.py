@@ -59,11 +59,11 @@ def split_faces(line):
     return split_lines
 
 
-def extract_points(obj_file_content):
+def extract_points(obj_file_content, scale=1):
     x_list = []
     y_list = []
     z_list = []
-    scale = 1
+    # scale = 1
     y_offset = 1
 
     # u_list = []
@@ -319,15 +319,15 @@ def extract_faces(obj_file_content, uv_list, mtl_offsets_dict):
         # "u_c": [0] * len(triangle_a_list),
         # "v_c": [0] * len(triangle_a_list),
 
-        "u_a": triangle_u_a_list,
-        "v_a": triangle_v_a_list,
+        "u_a": triangle_u_c_list,
+        "v_a": triangle_v_c_list,
         "u_b": triangle_u_b_list,
         "v_b": triangle_v_b_list,
-        "u_c": triangle_u_c_list,
-        "v_c": triangle_v_c_list,
-        "bright_a": [0] * len(triangle_a_list),
-        "bright_b": [0] * len(triangle_a_list),
-        "bright_c": [0] * len(triangle_a_list),
+        "u_c": triangle_u_a_list,
+        "v_c": triangle_v_a_list,
+        "bright_a": [64] * len(triangle_a_list),
+        "bright_b": [64] * len(triangle_a_list),
+        "bright_c": [64] * len(triangle_a_list),
         "thing_index": [0] * len(triangle_a_list),
         # "col2": [0] * len(triangle_a_list),
         "col2": [143] * len(triangle_a_list),
@@ -341,7 +341,7 @@ def extract_faces(obj_file_content, uv_list, mtl_offsets_dict):
     return [df_triangles, df_quadrangles]
 
 
-def extract_obj_to_df(obj_filepath):
+def extract_obj_to_df(obj_filepath, scale=1):
     [dst_textures, mtl_names] = grab_dst_textures(obj_filepath)
     texture_numbers = []
     mtl_offsets_dict = {}
@@ -353,7 +353,7 @@ def extract_obj_to_df(obj_filepath):
         mtl_offsets_dict[mtl_name] = uv_tuple_offsets
 
     obj_file_content = extract_obj_file(obj_filepath)
-    [df_points, uv_list] = extract_points(obj_file_content)
+    [df_points, uv_list] = extract_points(obj_file_content, scale)
     [df_triangles, df_quadrangles] = extract_faces(obj_file_content, uv_list, mtl_offsets_dict)
 
     return [df_points, df_triangles, df_quadrangles]
