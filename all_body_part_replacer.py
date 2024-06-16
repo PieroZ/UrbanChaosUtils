@@ -774,15 +774,29 @@ def app2():
 
 def apply_multiple_body_parts():
     input_all_filename = "darci1.all"
+    keys = ["skull_gta3.obj", "torso_gta3.obj", "pelvis_gta3.obj", "rfemur_gta3.obj", "lfemur_gta3.obj",
+            "rtibia_gta3.obj", "ltibia_gta3.obj", "rfoot_gta3.obj", "lfoot_gta3.obj"]
 
-    input_dict = {"skull_gta3.obj": "skull00",
-                  "torso_gta3.obj": "torso00",
-                  "pelvis_gta3.obj": "pelvis00",
+    input_dict = {keys[0]: "skull00",
+                  keys[1]: "torso00",
+                  keys[2]: "pelvis00",
+                  keys[3]: "rfemur00",
+                  keys[4]: "lfemur00",
+                  keys[5]: "rtibia00",
+                  keys[6]: "ltibia00",
+                  keys[7]: "lfoot00",
+                  keys[8]: "rfoot00",
                   }
 
-    scale_dict = {"skull_gta3.obj": 0.7,
-                  "torso_gta3.obj": 1.0,
-                  "pelvis_gta3.obj": 1.0,
+    scale_dict = {keys[0]: 0.8,
+                  keys[1]: 1.0,
+                  keys[2]: 1.0,
+                  keys[3]: 1.3,
+                  keys[4]: 1.0,
+                  keys[5]: 1.0,
+                  keys[6]: 1.0,
+                  keys[7]: 1.3,
+                  keys[8]: 1.3,
                   }
 
     for key, value in input_dict.items():
