@@ -145,7 +145,7 @@ def export_to_obj_format_with_uvs(filename, nprim_name, vertices, df_quadrangles
             uvbid = triangles_uv_full_set.index([ub, vb]) + 1 + len(uv_full_set)
             uvcid = triangles_uv_full_set.index([uc, vc]) + 1 + len(uv_full_set)
 
-            line = f"\nf {str(a)}/{uvaid} {str(b)}/{uvbid} {str(c)}/{uvcid}"
+            line = f"\nf {str(c)}/{uvcid} {str(b)}/{uvbid} {str(a)}/{uvaid}"
 
             if texture_per_triangle_face[index] in lines_per_material:
                 lines_per_material[texture_per_triangle_face[index]].append(line)
@@ -721,14 +721,14 @@ def grab_all_files_as_list(dir_path):
 def app():
     # binary_data = read_nprim("pzi_prim337.pzi")
     # binary_data = read_nprim("all/DARCI1.all")
-    all_filename_list = (grab_all_files_as_list("all/"))
+    all_filename_list = (grab_all_files_as_list("res/all/"))
     # all_filename_list = ["banesuit.all"]
-    all_filename_list = ["dupa.all"]
+    all_filename_list = ["RETAIL_DARCI1.all"]
 
     # all_filename = "anim002.all"
     for all_filename in all_filename_list:
         # all_filename = "DARCI1.all"
-        binary_data = read_nprim("all/" + all_filename)
+        binary_data = read_nprim("res/all/" + all_filename)
         # binary_data = read_nprim("all/anim001.all")
 
         cursor = 4
