@@ -63,7 +63,7 @@ def write_custom_format(file_path, vertices, texture_vertices, faces, materials,
             material, face_vertices, face_textures = face
             file.write(
                 # f"Face: Material {material:2} xyz ({face_vertices[0]:4},{face_vertices[1]:4},{face_vertices[2]:4}) uv ({face_textures[0]:4},{face_textures[1]:4},{face_textures[2]:4}) edge (1, 1, 1) group 1\n")
-                f"Face: Material 0 xyz ({face_vertices[1]:4},{face_vertices[2]:4},{face_vertices[0]:4}) uv ({face_textures[0]:4},{face_textures[2]:4},{face_textures[1]:4}) edge (1, 1, 1) group 1\n")
+                f"Face: Material 0 xyz ({face_vertices[0]:4},{face_vertices[1]:4},{face_vertices[2]:4}) uv ({face_textures[0]:4},{face_textures[1]:4},{face_textures[2]:4}) edge (1, 1, 1) group 1\n")
                 # f"Face: Material 0 xyz ({face_vertices[1]:4},{face_vertices[2]:4},{face_vertices[0]:4}) uv ({face_textures[1]:4},{face_textures[2]:4},{face_textures[0]:4}) edge (1, 1, 1) group 1\n")
 
 
