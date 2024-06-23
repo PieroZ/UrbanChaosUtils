@@ -1,4 +1,10 @@
 import pandas as pd
+import os
+
+def get_parent_directory(path):
+    # Extract the base directory name
+    parent_directory = os.path.basename(os.path.dirname(path))
+    return parent_directory
 
 
 def grab_dst_textures(obj_filepath):
@@ -25,6 +31,28 @@ def calculate_texture_page_and_uv_offsets(texture_file_number):
     # page = texture_file_number + 64 * 10
     texture_page = int(page / 64)
     base_page = (texture_page - 11) * 64
+    remainder = texture_file_number - base_page
+    u_offset = remainder % 8
+    v_offset = int(remainder / 8)
+
+    result = (texture_page, u_offset, v_offset)
+
+    return result
+
+
+def calculate_texture_page_and_uv_offsets_v2(texture_file_number, parent_dir):
+    dir_based_multiplier = 11
+    if parent_dir == "people":
+        dir_based_multiplier = 9
+    elif parent_dir == "people":
+        dir_based_multiplier = 11
+    elif parent_dir == "people2":
+        dir_based_multiplier = 18
+
+    page = texture_file_number + 64 * dir_based_multiplier
+    # page = texture_file_number + 64 * 10
+    texture_page = int(page / 64)
+    base_page = (texture_page - dir_based_multiplier) * 64
     remainder = texture_file_number - base_page
     u_offset = remainder % 8
     v_offset = int(remainder / 8)
@@ -348,8 +376,9 @@ def extract_obj_to_df(obj_filepath, scale=1):
     for dst_texture in dst_textures:
         texture_numbers.append((extract_texture_number_from_texture_filename(dst_texture)))
 
-    for texture_number, mtl_name in zip(texture_numbers, mtl_names):
-        uv_tuple_offsets = calculate_texture_page_and_uv_offsets(texture_number)
+    for texture_number, mtl_name, dst_texture in zip(texture_numbers, mtl_names, dst_textures):
+        parent_dir = get_parent_directory(dst_texture)
+        uv_tuple_offsets = calculate_texture_page_and_uv_offsets_v2(texture_number, parent_dir)
         mtl_offsets_dict[mtl_name] = uv_tuple_offsets
 
     obj_file_content = extract_obj_file(obj_filepath)

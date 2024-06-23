@@ -35,6 +35,7 @@ def export_to_obj_format_with_uvs(filename, nprim_name, vertices, df_quadrangles
     uv_set = []
     uv_full_set = []
     textures_per_quad_face = []
+    texture_page_per_material = {}
     for index, row in enumerate(df_quadrangles):
         ua = row["u_a"]
         va = row["v_a"]
@@ -46,9 +47,9 @@ def export_to_obj_format_with_uvs(filename, nprim_name, vertices, df_quadrangles
         vd = row["v_d"]
         texture_page = row["texture_id_group"]
 
-        result_with_texture_page = (calc_uvs(ua, va, ub, vb, uc, vc, ud, vd, texture_page, texture_file_numbers))
+        result_with_texture_page = (calc_uvs(ua, va, ub, vb, uc, vc, ud, vd, texture_page, texture_file_numbers, texture_page_per_material))
 
-        result = result_with_texture_page[1:]
+        result = result_with_texture_page[1:-1]
 
         for r in result:
             uv_full_set.append(r)
@@ -68,9 +69,9 @@ def export_to_obj_format_with_uvs(filename, nprim_name, vertices, df_quadrangles
         vc = row["v_c"]
         texture_page = row["texture_id_group"]
 
-        result_with_texture_page = (calc_uvs_triangles(ua, va, ub, vb, uc, vc, texture_page, texture_file_numbers))
+        result_with_texture_page = (calc_uvs_triangles(ua, va, ub, vb, uc, vc, texture_page, texture_file_numbers, texture_page_per_material))
 
-        result = result_with_texture_page[1:]
+        result = result_with_texture_page[1:-1]
 
         for r in result:
             triangles_uv_full_set.append(r)
@@ -123,7 +124,9 @@ def export_to_obj_format_with_uvs(filename, nprim_name, vertices, df_quadrangles
             # uvdid = str(index*4+3+1)
 
             # line = "\n" + "f " + str(a[0] + 1) + " " + str(b[0] + 1) + " " + str(d[0] + 1) + " " + str(c[0] + 1)
-            line = f"\nf {str(a)}/{uvaid} {str(b)}/{uvbid} {str(d)}/{uvdid} {str(c)}/{uvcid}"
+            # line = f"\nf {str(a)}/{uvaid} {str(b)}/{uvbid} {str(d)}/{uvdid} {str(c)}/{uvcid}"
+
+            line = f"\nf {str(c)}/{uvcid} {str(d)}/{uvdid} {str(b)}/{uvbid} {str(a)}/{uvaid}"
             if textures_per_quad_face[index] in lines_per_material:
                 lines_per_material[textures_per_quad_face[index]].append(line)
             else:
@@ -179,11 +182,29 @@ def export_to_obj_format_with_uvs(filename, nprim_name, vertices, df_quadrangles
             l6 = "Ni 1.450000\n"
             l7 = "d 1.000000\n"
             l8 = f"illum 1\n"
-            absolute_texture_path = "C:/Games/Urban Chaos/server/textures/shared/" + texture_pack
+            absolute_texture_path = "C:/Games/Urban Chaos/server/textures/shared/" + texture_page_per_material[key]
             # map_Kd = f"map_Kd C:/Games/Urban Chaos/server/textures/shared/people/tex{key:03d}hi.tga\n"
             map_Kd = f"map_Kd {absolute_texture_path}/tex{key:03d}hi.tga\n"
 
             output_material_file.writelines([l1, l2, l3, l4, l5, l6, l7, l8, map_Kd])
+
+    # with open(output_material_filename, "w") as output_material_file:
+    #     for key, value in texture_page_per_material.items():
+    #         material_line = f"\nnewmtl Material.{key}\n"
+    #         output_material_file.write(material_line)
+    #         l1 = "Ns 250.000000\n"
+    #         l2 = "Ns 0.000000\n"
+    #         l3 = "Ka 1.000000 1.000000 1.000000\n"
+    #         l4 = "Ks 0.000000 0.000000 0.000000\n"
+    #         l5 = "Ke 0.000000 0.000000 0.000000\n"
+    #         l6 = "Ni 1.450000\n"
+    #         l7 = "d 1.000000\n"
+    #         l8 = f"illum 1\n"
+    #         absolute_texture_path = f"C:/Games/Urban Chaos/server/textures/shared/{value}"
+    #         # map_Kd = f"map_Kd C:/Games/Urban Chaos/server/textures/shared/people/tex{key:03d}hi.tga\n"
+    #         map_Kd = f"map_Kd {absolute_texture_path}/tex{key:03d}hi.tga\n"
+    #
+    #         output_material_file.writelines([l1, l2, l3, l4, l5, l6, l7, l8, map_Kd])
 
 
 def write_obj_file(vertices, triangle_faces, quadrangle_faces, filename):
@@ -369,7 +390,7 @@ def calc_final_uv(a, base_a):
     return a
 
 
-def calc_uvs_triangles(u0, v0, u1, v1, u2, v2, texture_page, texture_numbers):
+def calc_uvs_triangles(u0, v0, u1, v1, u2, v2, texture_page, texture_numbers, texture_page_per_material):
     global texture_pack
     TEXTURE_NORM_SIZE = 32
     TEXTURE_NORM_SQUARES = 8
@@ -394,18 +415,23 @@ def calc_uvs_triangles(u0, v0, u1, v1, u2, v2, texture_page, texture_numbers):
     if page < 64 * 9:
         texture_page_offset = 64*8
         texture_pack = "insides"
+        texture_dir = "insides"
     elif page < 64 * 11:
         texture_page_offset = 64*9
         texture_pack = "people"
+        texture_dir = "people"
     elif page < 64 * 18:
         texture_page_offset = 64*11
         texture_pack = "prims"
+        texture_dir = "prims"
     elif page < 64 * 21:
         texture_page_offset = 64*18
         texture_pack = "people2"
+        texture_dir = "people2"
     else:
         texture_page_offset = 0
-        texture_pack = "people123"
+        texture_pack = "UNDEFINED"
+        texture_dir = "UNDEFINED"
 
     texture_img_no = page - texture_page_offset
     if texture_img_no not in texture_numbers:
@@ -420,10 +446,13 @@ def calc_uvs_triangles(u0, v0, u1, v1, u2, v2, texture_page, texture_numbers):
     final_v2 = abs(1 - final_v2)
     # final_u3 = abs(1 - final_u3)
 
-    return [texture_img_no, [final_u0, final_v0], [final_u1, final_v1], [final_u2, final_v2]]
+    texture_page_per_material[texture_img_no] = texture_dir
 
 
-def calc_uvs(u0, v0, u1, v1, u2, v2, u3, v3, texture_page, texture_numbers):
+    return [texture_img_no, [final_u0, final_v0], [final_u1, final_v1], [final_u2, final_v2], texture_dir]
+
+
+def calc_uvs(u0, v0, u1, v1, u2, v2, u3, v3, texture_page, texture_numbers, texture_page_per_material):
     global texture_pack
     TEXTURE_NORM_SIZE = 32
     TEXTURE_NORM_SQUARES = 8
@@ -447,22 +476,26 @@ def calc_uvs(u0, v0, u1, v1, u2, v2, u3, v3, texture_page, texture_numbers):
     page = av_u + av_v * TEXTURE_NORM_SQUARES + texture_page * TEXTURE_NORM_SQUARES * TEXTURE_NORM_SQUARES
     # print(f'page = {page}')
 
-
     if page < 64 * 9:
         texture_page_offset = 64*8
         texture_pack = "insides"
+        texture_dir = "insides"
     elif page < 64 * 11:
         texture_page_offset = 64*9
-        texture_pack = "people2"
+        texture_pack = "people"
+        texture_dir = "people"
     elif page < 64 * 18:
         texture_page_offset = 64*11
         texture_pack = "prims"
+        texture_dir = "prims"
     elif page < 64 * 21:
         texture_page_offset = 64*18
         texture_pack = "people2"
+        texture_dir = "people2"
     else:
         texture_page_offset = 0
-        texture_pack = "people123"
+        texture_pack = "UNDEFINED"
+        texture_dir = "UNDEFINED"
 
     texture_img_no = page-texture_page_offset
 
@@ -479,7 +512,9 @@ def calc_uvs(u0, v0, u1, v1, u2, v2, u3, v3, texture_page, texture_numbers):
     # final_u3 = abs(1 - final_u3)
     final_v3 = abs(1 - final_v3)
 
-    return [texture_img_no, [final_u0, final_v0], [final_u1, final_v1], [final_u2, final_v2], [final_u3, final_v3]]
+    texture_page_per_material[texture_img_no] = texture_dir
+
+    return [texture_img_no, [final_u0, final_v0], [final_u1, final_v1], [final_u2, final_v2], [final_u3, final_v3], texture_dir]
 
 
 def read_nprim(nprim_file_name):
@@ -723,7 +758,7 @@ def app():
     # binary_data = read_nprim("all/DARCI1.all")
     all_filename_list = (grab_all_files_as_list("res/all/"))
     # all_filename_list = ["banesuit.all"]
-    all_filename_list = ["RETAIL_DARCI1.all"]
+    all_filename_list = ["roper.all"]
 
     # all_filename = "anim002.all"
     for all_filename in all_filename_list:

@@ -325,7 +325,7 @@ def app():
     # anim_file = "gargoyle"
 
     # anim_file = "banesuit"
-    anim_file = "TESTdarci1"
+    anim_file = "roper"
 
 
     body_parts_offsets_filepaths = grab_filepaths_with_extension("output/body-part-offsets/" + anim_file + "/*", '.txt')

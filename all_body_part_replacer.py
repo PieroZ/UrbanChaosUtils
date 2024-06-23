@@ -1,3 +1,5 @@
+import os
+import glob
 import numpy as np
 from obj_to_dataframe import *
 import struct
@@ -680,6 +682,7 @@ def app(input_all_filename, input_obj, body_part_name, scale=1):
         body_part_start_end_point_dict[name] = [body_part_meta.s0, body_part_meta.e0, body_part_meta.sf3, body_part_meta.ef3, body_part_meta.sf4, body_part_meta.ef4]
         body_parts_meta.append(body_part_meta)
         names_ordered.append(name)
+        print(i)
 
     [a, b, c, d, skull_obj_end_cursor, e, f] = \
         convert_nprim_binary_to_readable_data(found_at, 0, binary_data)
@@ -806,5 +809,24 @@ def apply_multiple_body_parts():
         app(input_all_filename, input_obj, body_part_name, scale)
 
 
+def grab_files_with_extension(directory, ext):
+    all_files_list = []
+    for filename in glob.iglob(f'{directory}{ext}'):
+        all_files_list.append(os.path.basename(filename))
+
+    return all_files_list
+
+
+def apply_multiple_body_parts_matching_names():
+    input_all_filename = "roper.all"
+    # objs_dir = 'res/objs/whole-model-gta3/'
+    objs_dir = 'output/frames-per-anim-file/roper/tests/'
+    ext = "*.obj"
+    obj_list = grab_files_with_extension(objs_dir, ext)
+    for obj in obj_list:
+        input_obj_path = f'{objs_dir}{obj}'
+        app(input_all_filename, input_obj_path, obj[:-4].lower())
+
+
 if __name__ == '__main__':
-    apply_multiple_body_parts()
+    apply_multiple_body_parts_matching_names()

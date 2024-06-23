@@ -204,6 +204,8 @@ def app():
     input_all_file_path = f'res/all/{input_all_file_name}'
     output_name = f'output/tex/my_roper.tex'
 
+    debug_output_name = f'output/tex/roper_day_by_day_DEBUG_'
+
     all_binary_content = read_binary(input_all_file_path)
 
     cursor = 8
@@ -215,6 +217,16 @@ def app():
         [quadrangles, triangles, name, cursor] = extract_tex_sections_from_all(cursor, all_binary_content)
         body_part_tex_data = prepare_tex_data(triangles, quadrangles)
         tex_data.extend(body_part_tex_data)
+
+        debug_output_name_final = f'{debug_output_name}{i}.tex'
+
+        # with open(debug_output_name_final, 'wb') as file:
+        #     file.write(body_part_tex_data)
+
+        # print(''.join('{:02x}'.format(x) for x in body_part_tex_data))
+
+        # hex_str = body_part_tex_data.hex()
+        # print(hex_str)
 
     with open(output_name, 'wb') as file:
         file.write(tex_data)
