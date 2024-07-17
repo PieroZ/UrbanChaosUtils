@@ -14,7 +14,6 @@ def list_obj_files(directory):
 
 def import_obj(obj_path):
     file_loc = obj_path
-    print(f'obj_path={obj_path}')
     # Extract the name of the object from the file name
     obj_name = os.path.splitext(os.path.basename(file_loc))[0]
 
@@ -97,11 +96,16 @@ def degrees_to_matrix(x_deg, y_deg, z_deg):
     return rotation_matrix
 
 
-def rotate_90_degrees_x():
+def rotate_degrees_x(degrees):
     # Create a rotation matrix for 90 degrees around the X axis
-    rotation_angle = math.radians(90)
+    rotation_angle = math.radians(degrees)
     rotation_matrix = mathutils.Matrix.Rotation(rotation_angle, 4, 'X')
     return rotation_matrix
+
+
+def apply_rotation_to_object(obj, rotation_matrix):
+    # Apply the rotation matrix to the object's matrix_world
+    obj.matrix_world = rotation_matrix @ obj.matrix_world
 
 
 def apply_transformations_from_file(file_no, obj, mesh_name):
@@ -133,7 +137,7 @@ def apply_transformations_from_file(file_no, obj, mesh_name):
             transformation_matrix = mathutils.Matrix.Translation(translation_vector) @ rotation_matrix.to_4x4()
 
             # Apply the additional 90-degree rotation around the X axis
-            rotation_90_x = rotate_90_degrees_x()
+            rotation_90_x = rotate_degrees_x(90)
             transformation_matrix = rotation_90_x @ transformation_matrix
 
             # Apply the transformation to the object's matrix_world
@@ -172,9 +176,19 @@ def order_vue_angles_2(rotation_matrix):
 
 
 def extract_current_pose_to_vue(frame_no):
+    print(f'')
+    print(f'')
+    print(f'')
     # Iterate over all objects in the scene
     for obj in bpy.data.objects:
         if obj.type == 'MESH':
+            rotation_90_x = rotate_degrees_x(-90)
+            apply_rotation_to_object(obj, rotation_90_x)
+            #            transformation_matrix = rotation_90_x @ transformation_matrix
+
+            #            # Apply the transformation to the object's matrix_world
+            #            obj.matrix_world = transformation_matrix
+
             vue_x, vue_y, vue_z = vue_translation_vector(obj.location[0], obj.location[1], obj.location[2])
             euler_angles_degrees = euler_to_degrees(obj.rotation_euler)
 
@@ -185,8 +199,11 @@ def extract_current_pose_to_vue(frame_no):
 
             print(vue_entry)
 
+            rotation_90_x = rotate_degrees_x(90)
+            apply_rotation_to_object(obj, rotation_90_x)
 
-if __name__ == '__main__':
+
+def do_import(keyframe_no):
     # Example usage
     base_obj_directory = 'C:/dev/workspaces/python/urban chaos research/output/all-obj/roper/0/'
 
@@ -203,13 +220,8 @@ if __name__ == '__main__':
     for obj_file in obj_list:
         ignore = False
         for ignored_element in ignored_list:
-            print(f'ignored_element={ignored_element}')
-            print(f'obj_file={obj_file}')
             if ignored_element in obj_file:
-                print(f'ignored obj_file={obj_file}')
                 ignore = True
-            else:
-                print(f'ignored element is not in the obj_file')
 
         if not ignore:
             obj_path = os.path.join(base_obj_directory, obj_file)
@@ -219,7 +231,7 @@ if __name__ == '__main__':
             initial_matrix = get_transformation_matrix(imported_object)
 
             # Apply transformations
-            apply_transformations_from_file(313, imported_object, imported_object.name)
+            apply_transformations_from_file(keyframe_no, imported_object, imported_object.name)
             #        apply_transformations(imported_object)
 
             # Get the current transformation matrix
@@ -235,10 +247,14 @@ if __name__ == '__main__':
             # Convert rotation angles from radians to degrees
             rotation_degrees = [math.degrees(angle) for angle in rotation]
 
-    #            print(f"Initial matrix: {initial_matrix}")
-    #            print(f"Current matrix: {current_matrix}")
-    #            print(f"Relative matrix: {relative_matrix}")
-    #            print(f"Relative translation: {translation}")
-    #            print(f"Relative rotation (in degrees): {rotation_degrees}")
-    #        print_coordinates(imported_object)
+
+#            print(f"Initial matrix: {initial_matrix}")
+#            print(f"Current matrix: {current_matrix}")
+#            print(f"Relative matrix: {relative_matrix}")
+#            print(f"Relative translation: {translation}")
+#            print(f"Relative rotation (in degrees): {rotation_degrees}")
+#        print_coordinates(imported_object)
+if __name__ == '__main__':
+    #    do_import(454)
+
     extract_current_pose_to_vue(414)
