@@ -776,31 +776,43 @@ def app2():
 
 
 def apply_multiple_body_parts():
-    input_all_filename = "darci1.all"
-    keys = ["skull_gta3.obj", "torso_gta3.obj", "pelvis_gta3.obj", "rfemur_gta3.obj", "lfemur_gta3.obj",
-            "rtibia_gta3.obj", "ltibia_gta3.obj", "rfoot_gta3.obj", "lfoot_gta3.obj"]
+    # input_all_filename = "darci1.all"
+    # keys = ["skull_gta3.obj", "torso_gta3.obj", "pelvis_gta3.obj", "rfemur_gta3.obj", "lfemur_gta3.obj",
+    #         "rtibia_gta3.obj", "ltibia_gta3.obj", "rfoot_gta3.obj", "lfoot_gta3.obj"]
+    #
+    # input_dict = {keys[0]: "skull00",
+    #               keys[1]: "torso00",
+    #               keys[2]: "pelvis00",
+    #               keys[3]: "rfemur00",
+    #               keys[4]: "lfemur00",
+    #               keys[5]: "rtibia00",
+    #               keys[6]: "ltibia00",
+    #               keys[7]: "lfoot00",
+    #               keys[8]: "rfoot00",
+    #               }
+    #
+    # scale_dict = {keys[0]: 0.8,
+    #               keys[1]: 1.0,
+    #               keys[2]: 1.0,
+    #               keys[3]: 1.3,
+    #               keys[4]: 1.0,
+    #               keys[5]: 1.0,
+    #               keys[6]: 1.0,
+    #               keys[7]: 1.3,
+    #               keys[8]: 1.3,
+    #               }
 
-    input_dict = {keys[0]: "skull00",
-                  keys[1]: "torso00",
-                  keys[2]: "pelvis00",
-                  keys[3]: "rfemur00",
-                  keys[4]: "lfemur00",
-                  keys[5]: "rtibia00",
-                  keys[6]: "ltibia00",
-                  keys[7]: "lfoot00",
-                  keys[8]: "rfoot00",
+    input_all_filename = "anim003.all"
+
+    keys = ["wiz8_demonhead.obj"]
+
+    input_dict = {keys[0]: "head",
                   }
 
-    scale_dict = {keys[0]: 0.8,
-                  keys[1]: 1.0,
-                  keys[2]: 1.0,
-                  keys[3]: 1.3,
-                  keys[4]: 1.0,
-                  keys[5]: 1.0,
-                  keys[6]: 1.0,
-                  keys[7]: 1.3,
-                  keys[8]: 1.3,
+    scale_dict = {keys[0]: 1.0
                   }
+
+    # wiz8_demonhead.obj
 
     for key, value in input_dict.items():
         input_obj = f'res/objs/{key}'
@@ -818,9 +830,9 @@ def grab_files_with_extension(directory, ext):
 
 
 def apply_multiple_body_parts_matching_names():
-    input_all_filename = "roper.all"
-    # objs_dir = 'res/objs/whole-model-gta3/'
-    objs_dir = 'output/frames-per-anim-file/roper/tests/'
+    input_all_filename = "darci1.all"
+    objs_dir = 'res/objs/whole-model-gta3/'
+    # objs_dir = 'output/frames-per-anim-file/roper/tests/'
     ext = "*.obj"
     obj_list = grab_files_with_extension(objs_dir, ext)
     for obj in obj_list:
@@ -829,4 +841,4 @@ def apply_multiple_body_parts_matching_names():
 
 
 if __name__ == '__main__':
-    apply_multiple_body_parts_matching_names()
+    apply_multiple_body_parts()

@@ -758,7 +758,7 @@ def app():
     # binary_data = read_nprim("all/DARCI1.all")
     all_filename_list = (grab_all_files_as_list("res/all/"))
     # all_filename_list = ["banesuit.all"]
-    all_filename_list = ["roper.all"]
+    all_filename_list = ["anim003.all"]
 
     # all_filename = "anim002.all"
     for all_filename in all_filename_list:

@@ -200,9 +200,9 @@ def read_binary(binary_file_path):
 
 
 def app():
-    input_all_file_name = 'roper.all'
+    input_all_file_name = 'darci1.all'
     input_all_file_path = f'res/all/{input_all_file_name}'
-    output_name = f'output/tex/my_roper.tex'
+    output_name = f'output/tex/gta3.tex'
 
     debug_output_name = f'output/tex/roper_day_by_day_DEBUG_'
 
