@@ -28,5 +28,5 @@ https://github.com/PieroZ/UrbanChaosUtils/assets/3080931/98f7e9ad-f4c2-4de1-bc2c
 # Acknowledgements
 
    + **Urban Chaos Discord**:  [Urban Chaos Discord](https://discord.gg/uHny8apA2n) Thanks for being an amazing community! I would have not continuted this work if it weren't for you guys! 
-   + **SirSwish**: Special thanks to SirSwish who has been a very active member of the UC community. He developed tools for the UC modders such as [UC-MapPainter]([UC-MapPainter](https://github.com/SirSwish/UC-MapPainter)) or [UC-ModelViewer]([UC-ModelViewer](https://github.com/SirSwish/UC-ModelViewer)). 
+   + **SirSwish**: Special thanks to SirSwish who has been a very active member of the UC community. He developed tools for the UC modders such as [UC-MapPainter](https://github.com/SirSwish/UC-MapPainter) or [UC-ModelViewer](https://github.com/SirSwish/UC-ModelViewer). 
    + **Mike Diskett**: Mike Diskett made [MuckyFoot-UrbanChaos](https://github.com/dizzy2003/MuckyFoot-UrbanChaos) repo public which sparked my interest to reverse engineer some of it's aspects. This project would have not been possible if it weren't for him.
