@@ -6,12 +6,47 @@ import os
 from pathlib import Path
 import glob
 
+from enum import Enum
+
+
+pd.set_option('future.no_silent_downcasting', True)
+
+
 collision_type_map = {
     0: "Normal",
     1: "None",
     2: "Tree",  # central cylindrical collision
     3: "Reduced"  # collision a bit smaller than the object
 }
+
+
+class PrimFormat(Enum):
+    UNDEFINED = 0
+    NPRIM = 1
+    PRIM = 2
+
+
+def determine_file_format(filename):
+    """
+    Determines the file format based on the filename.
+
+    Args:
+        filename (str): The name of the file.
+
+    Returns:
+        int: 1 if it's an nprim format, 2 if it's a prim format, 0 if it's something else.
+    """
+
+    # Get the base name of the file (removes directory path)
+    basename = os.path.basename(filename)
+
+    # Check the prefix of the filename
+    if basename.startswith("nprim"):
+        return 1
+    elif basename.startswith("prim"):
+        return 2
+    else:
+        return 0
 
 
 def export_to_obj_format(filename, nprim_name, df_points, df_quadrangles, df_triangles):
@@ -27,7 +62,7 @@ def export_to_obj_format(filename, nprim_name, df_points, df_quadrangles, df_tri
     # Path(filename).stem
     # file_wo_ext = os.path.splitext(filename)[0] + "/out/" + filename + ".obj"
     texture_file_numbers = []
-    output_filename = "out/" + Path(filename).stem + "-" + nprim_name + '.obj'
+    output_filename = "output/objs/" + Path(filename).stem + "-" + nprim_name + '.obj'
     output_filename = output_filename.replace('\\r', '')
     uv_set = []
     uv_full_set = []
@@ -158,7 +193,7 @@ def export_to_obj_format(filename, nprim_name, df_points, df_quadrangles, df_tri
             for f_line in faces_lines:
                 output_file.write(f_line)
 
-    output_material_filename = "out/" + Path(filename).stem + "-" + nprim_name + '.mtl'
+    output_material_filename = "output/objs/" + Path(filename).stem + "-" + nprim_name + '.mtl'
     output_material_filename = output_material_filename.replace('\\r', '')
     with open(output_material_filename, "w") as output_material_file:
         for key, value in lines_per_material.items():
@@ -206,21 +241,47 @@ def create_blank_nprim_dataframe():
     return df
 
 
-def convert_nprim_binary_to_readable_data(data):
+# Function to safely cast to int16
+def safe_int16(value):
+    # Clamp the value to the range of int16
+    if value > 32767:
+        value -= 65536
+    return np.int16(value)
+
+
+def convert_nprim_binary_to_readable_data(data, prim_version):
     readable_data = []
-    signature = int.from_bytes(data[0:2], "little")
-    null_terminated_pos = data.find(b'\00')
-    name = data[2:null_terminated_pos-1].decode("utf-8")
-    first_point_id = int.from_bytes(data[34: 36], "little")
-    last_point_id = int.from_bytes(data[36: 38], "little")
-    first_quadrangle_id = int.from_bytes(data[38: 40], "little")
-    last_quadrangle_id = int.from_bytes(data[40: 42], "little")
-    first_triangle_id = int.from_bytes(data[42: 44], "little")
-    last_triangle_id = int.from_bytes(data[44: 46], "little")
-    collision_type = int.from_bytes(data[46:47], "little")
-    reaction_to_impact_by_vehicle = int.from_bytes(data[47:48], "little")
-    shadow_type = int.from_bytes(data[48:49], "little")
-    various_properties = int.from_bytes(data[49:50], "little")
+    cursor = 0
+
+    if prim_version == PrimFormat.NPRIM.value:
+        signature = int.from_bytes(data[0:2], "little")
+        null_terminated_pos = data.find(b'\00')
+        name = data[2:null_terminated_pos-1].decode("utf-8")
+        first_point_id = int.from_bytes(data[34: 36], "little")
+        last_point_id = int.from_bytes(data[36: 38], "little")
+        first_quadrangle_id = int.from_bytes(data[38: 40], "little")
+        last_quadrangle_id = int.from_bytes(data[40: 42], "little")
+        first_triangle_id = int.from_bytes(data[42: 44], "little")
+        last_triangle_id = int.from_bytes(data[44: 46], "little")
+        collision_type = int.from_bytes(data[46:47], "little")
+        reaction_to_impact_by_vehicle = int.from_bytes(data[47:48], "little")
+        shadow_type = int.from_bytes(data[48:49], "little")
+        various_properties = int.from_bytes(data[49:50], "little")
+        cursor = 50
+    elif prim_version == PrimFormat.PRIM.value:
+        null_terminated_pos = data.find(b'\00')
+        name = data[0:null_terminated_pos - 1].decode("utf-8")
+        first_point_id = int.from_bytes(data[32: 34], "little")
+        last_point_id = int.from_bytes(data[34: 36], "little")
+        first_quadrangle_id = int.from_bytes(data[36: 38], "little")
+        last_quadrangle_id = int.from_bytes(data[38: 40], "little")
+        first_triangle_id = int.from_bytes(data[40: 42], "little")
+        last_triangle_id = int.from_bytes(data[42: 44], "little")
+        collision_type = int.from_bytes(data[44:45], "little")
+        reaction_to_impact_by_vehicle = int.from_bytes(data[45:46], "little")
+        shadow_type = int.from_bytes(data[46:47], "little")
+        various_properties = int.from_bytes(data[47:48], "little")
+        cursor = 56
 
     collision_type = collision_type_map[collision_type]
 
@@ -228,36 +289,62 @@ def convert_nprim_binary_to_readable_data(data):
     quadrangle_count = last_quadrangle_id - first_quadrangle_id
     triangle_count = last_triangle_id - first_triangle_id
 
-    nprim_dict = {
-        "signature": signature,
-        "name": name,
-        "first_point_id": first_point_id,
-        "last_point_id": last_point_id,
-        "point_count": point_count,
+    if prim_version == PrimFormat.NPRIM.value:
+        nprim_dict = {
+            "signature": signature,
+            "name": name,
+            "first_point_id": first_point_id,
+            "last_point_id": last_point_id,
+            "point_count": point_count,
 
-        "first_quadrangle_id": first_quadrangle_id,
-        "last_quadrangle_id": last_quadrangle_id,
-        "quadrangle_count": quadrangle_count,
+            "first_quadrangle_id": first_quadrangle_id,
+            "last_quadrangle_id": last_quadrangle_id,
+            "quadrangle_count": quadrangle_count,
 
-        "first_triangle_id": first_triangle_id,
-        "last_triangle_id": last_triangle_id,
-        "triangle_count": triangle_count,
+            "first_triangle_id": first_triangle_id,
+            "last_triangle_id": last_triangle_id,
+            "triangle_count": triangle_count,
 
-        "collision_type": collision_type,
-        "reaction_to_impact_by_vehicle": reaction_to_impact_by_vehicle,
-        "shadow_type": shadow_type,
-        "various_properties": various_properties
-    }
+            "collision_type": collision_type,
+            "reaction_to_impact_by_vehicle": reaction_to_impact_by_vehicle,
+            "shadow_type": shadow_type,
+            "various_properties": various_properties
+        }
+    elif prim_version == PrimFormat.PRIM.value:
+        nprim_dict = {
+            "name": name,
+            "first_point_id": first_point_id,
+            "last_point_id": last_point_id,
+            "point_count": point_count,
+
+            "first_quadrangle_id": first_quadrangle_id,
+            "last_quadrangle_id": last_quadrangle_id,
+            "quadrangle_count": quadrangle_count,
+
+            "first_triangle_id": first_triangle_id,
+            "last_triangle_id": last_triangle_id,
+            "triangle_count": triangle_count,
+
+            "collision_type": collision_type,
+            "reaction_to_impact_by_vehicle": reaction_to_impact_by_vehicle,
+            "shadow_type": shadow_type,
+            "various_properties": various_properties
+        }
 
     readable_data.append(nprim_dict)
 
-    cursor = 50
     points = []
     for p_id in range(point_count):
         p_global_id = first_point_id + p_id
-        x = np.int16(int.from_bytes(data[cursor:cursor+2], "little"))
-        y = np.int16(int.from_bytes(data[cursor+2:cursor+4], "little"))
-        z = np.int16(int.from_bytes(data[cursor+4:cursor+6], "little"))
+        # x = np.int16(int.from_bytes(data[cursor:cursor+2], "little"))
+        # y = np.int16(int.from_bytes(data[cursor+2:cursor+4], "little"))
+        # z = np.int16(int.from_bytes(data[cursor+4:cursor+6], "little"))
+
+        # Fixing the lines with safe clamping and casting
+        x = safe_int16(int.from_bytes(data[cursor:cursor + 2], "little"))
+        y = safe_int16(int.from_bytes(data[cursor + 2:cursor + 4], "little"))
+        z = safe_int16(int.from_bytes(data[cursor + 4:cursor + 6], "little"))
+
         cursor = cursor + 6
 
         p_dict = {
@@ -376,7 +463,10 @@ def convert_nprim_binary_to_readable_data(data):
 
 def fill_dataframe_with_nprim_data(nprim_filename, df):
     data = read_nprim(nprim_filename)
-    [readable_data, points, quadrangles, triangles] = convert_nprim_binary_to_readable_data(data)
+
+    prim_version = determine_file_format(nprim_filename)
+
+    [readable_data, points, quadrangles, triangles] = convert_nprim_binary_to_readable_data(data, prim_version)
     df = pd.DataFrame.from_records(readable_data)
     df_points = pd.DataFrame.from_records(points)
     df_quadrangles = pd.DataFrame.from_records(quadrangles)
@@ -575,7 +665,9 @@ def app():
     # for p in prims_filenames:
     # nprim = "res/nprims/nprim058.prm"
 
-    nprim = "res/nprims/nprim157.prm" # switch
+    nprim = "res/nprims/prim046.prm"
+
+
     # nprim = "res/nprims/nprim216.prm" # switch
     # nprim = "res/nprims/nprim074.prm" # helibody
     # nprim = "res/nprims/nprim260.prm" # helibody
@@ -592,8 +684,10 @@ def app():
         export_to_obj_format(nprim, nprim_name, df_points, df_quadrangles, df_triangles)
         gui(df, df_points, df_quadrangles, df_triangles)
     else:
-        nprims_directory = 'res/nprims/'
+        nprims_directory = 'res/nprims/prototype/'
+        # nprims_directory = 'res/nprims/'
         for filename in glob.iglob(f'{nprims_directory}/*.prm'):
+            print(filename)
             [df, df_points, df_quadrangles, df_triangles] = fill_dataframe_with_nprim_data(filename, df)
             nprim_name = (df['name'].to_string(index=False, header=False))
             export_to_obj_format(filename, nprim_name, df_points, df_quadrangles, df_triangles)

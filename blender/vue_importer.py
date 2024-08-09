@@ -4,6 +4,23 @@ import math
 import mathutils
 import json
 import glob
+import re
+
+
+def process_multiple_kfs(kfs_id_list, character):
+    #    do_import(454, 'darci1')
+    vue_filepath = 'C:/dev/workspaces/repo clones/Clean-UrbanChaos/MuckyFoot-UrbanChaos/fallen/Release/data/Troper.vue'
+
+    #    extract_current_pose_to_vue(414)
+    with open(vue_filepath, 'r') as vue_file:
+        vue_content = vue_file.read()
+
+    new_frame_id = extract_frame_number(vue_content) + 1
+
+    for kfs_id in kfs_id_list:
+        do_import(kfs_id, character)
+        extract_current_pose_to_vue(new_frame_id, vue_filepath)
+        new_frame_id = new_frame_id + 1
 
 
 def list_obj_files(directory):
@@ -108,11 +125,11 @@ def apply_rotation_to_object(obj, rotation_matrix):
     obj.matrix_world = rotation_matrix @ obj.matrix_world
 
 
-def apply_transformations_from_file(file_no, obj, mesh_name):
-    rotation_json_file_path = f'C:/dev/workspaces/python/urban chaos research/output/body-part-offsets/roper/rotation_matrix_frame {file_no}.json'
+def apply_transformations_from_file(file_no, obj, mesh_name, character_name):
+    rotation_json_file_path = f'C:/dev/workspaces/python/urban chaos research/output/body-part-offsets/{character_name}/rotation_matrix_frame {file_no}.json'
     # Read the JSON file and store it in a dictionary
     rotation_dict = read_json_to_dict(rotation_json_file_path)
-    translation_json_file_path = f'C:/dev/workspaces/python/urban chaos research/output/body-part-offsets/roper/frame {file_no}.txt'
+    translation_json_file_path = f'C:/dev/workspaces/python/urban chaos research/output/body-part-offsets/{character_name}/frame {file_no}.txt'
     transform_dict = read_json_to_dict(translation_json_file_path)
 
     for key, value in rotation_dict.items():
@@ -175,35 +192,54 @@ def order_vue_angles_2(rotation_matrix):
             rotation_matrix[1][1]]
 
 
-def extract_current_pose_to_vue(frame_no):
+def extract_frame_number(vue_content):
+    # Define the regular expression pattern to match the frame number
+    pattern = r'frame (\d+)'
+
+    # Search for the pattern in the content
+    match = re.findall(pattern, vue_content)
+
+    # Convert the matched frame numbers to integers and return the highest one
+    if match:
+        frame_numbers = list(map(int, match))
+        return max(frame_numbers)
+    else:
+        return None
+
+
+def extract_current_pose_to_vue(frame_no, output_filepath):
     print(f'')
     print(f'')
     print(f'')
     # Iterate over all objects in the scene
-    for obj in bpy.data.objects:
-        if obj.type == 'MESH':
-            rotation_90_x = rotate_degrees_x(-90)
-            apply_rotation_to_object(obj, rotation_90_x)
-            #            transformation_matrix = rotation_90_x @ transformation_matrix
 
-            #            # Apply the transformation to the object's matrix_world
-            #            obj.matrix_world = transformation_matrix
+    with open(output_filepath, 'a') as output_vue_file:
+        output_vue_file.write(f'\nframe {frame_no}\n')
+        for obj in bpy.data.objects:
+            if obj.type == 'MESH':
+                rotation_90_x = rotate_degrees_x(-90)
+                apply_rotation_to_object(obj, rotation_90_x)
+                #            transformation_matrix = rotation_90_x @ transformation_matrix
 
-            vue_x, vue_y, vue_z = vue_translation_vector(obj.location[0], obj.location[1], obj.location[2])
-            euler_angles_degrees = euler_to_degrees(obj.rotation_euler)
+                #            # Apply the transformation to the object's matrix_world
+                #            obj.matrix_world = transformation_matrix
 
-            rotation_matrix = degrees_to_matrix(euler_angles_degrees[0], euler_angles_degrees[1],
-                                                euler_angles_degrees[2])
-            ordered_vue_matrix = order_vue_angles_2(rotation_matrix)
-            vue_entry = f'transform "{obj.name}" {ordered_vue_matrix[0]:.3f} {ordered_vue_matrix[1]:.3f} {ordered_vue_matrix[2]:.3f} {ordered_vue_matrix[3]:.3f} {ordered_vue_matrix[4]:.3f} {ordered_vue_matrix[5]:.3f} {ordered_vue_matrix[6]:.3f} {ordered_vue_matrix[7]:.3f} {ordered_vue_matrix[8]:.3f} {vue_x:.3f} {vue_z:.3f} {vue_y:.3f}'
+                vue_x, vue_y, vue_z = vue_translation_vector(obj.location[0], obj.location[1], obj.location[2])
+                euler_angles_degrees = euler_to_degrees(obj.rotation_euler)
 
-            print(vue_entry)
+                rotation_matrix = degrees_to_matrix(euler_angles_degrees[0], euler_angles_degrees[1],
+                                                    euler_angles_degrees[2])
+                ordered_vue_matrix = order_vue_angles_2(rotation_matrix)
+                vue_entry = f'transform "{obj.name}" {ordered_vue_matrix[0]:.3f} {ordered_vue_matrix[1]:.3f} {ordered_vue_matrix[2]:.3f} {ordered_vue_matrix[3]:.3f} {ordered_vue_matrix[4]:.3f} {ordered_vue_matrix[5]:.3f} {ordered_vue_matrix[6]:.3f} {ordered_vue_matrix[7]:.3f} {ordered_vue_matrix[8]:.3f} {vue_x:.3f} {vue_z:.3f} {vue_y:.3f}\n'
 
-            rotation_90_x = rotate_degrees_x(90)
-            apply_rotation_to_object(obj, rotation_90_x)
+                # print(vue_entry)
+                output_vue_file.write(vue_entry)
+
+                rotation_90_x = rotate_degrees_x(90)
+                apply_rotation_to_object(obj, rotation_90_x)
 
 
-def do_import(keyframe_no):
+def do_import(keyframe_no, character_name):
     # Example usage
     base_obj_directory = 'C:/dev/workspaces/python/urban chaos research/output/all-obj/roper/0/'
 
@@ -231,7 +267,7 @@ def do_import(keyframe_no):
             initial_matrix = get_transformation_matrix(imported_object)
 
             # Apply transformations
-            apply_transformations_from_file(keyframe_no, imported_object, imported_object.name)
+            apply_transformations_from_file(keyframe_no, imported_object, imported_object.name, character_name)
             #        apply_transformations(imported_object)
 
             # Get the current transformation matrix
@@ -255,6 +291,9 @@ def do_import(keyframe_no):
 #            print(f"Relative rotation (in degrees): {rotation_degrees}")
 #        print_coordinates(imported_object)
 if __name__ == '__main__':
-    #    do_import(454)
+    do_import(454, 'darci1')
 
-    extract_current_pose_to_vue(414)
+#    extract_current_pose_to_vue(414)
+#    kfs_ids = [131, 132, 133, 134, 135, 136, 137]
+#    character = 'darci1'
+#    process_multiple_kfs(kfs_ids,character)

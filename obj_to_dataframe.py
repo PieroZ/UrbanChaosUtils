@@ -22,8 +22,9 @@ def grab_dst_textures(obj_filepath):
 
 
 def extract_texture_number_from_texture_filename(texture_filename):
+    return int(texture_filename[-8:-5])
     # return int(texture_filename[-9:-6])
-    return int(texture_filename[-10:-7])
+    # return int(texture_filename[-10:-7])
 
 
 def calculate_texture_page_and_uv_offsets(texture_file_number):
