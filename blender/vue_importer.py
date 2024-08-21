@@ -126,10 +126,10 @@ def apply_rotation_to_object(obj, rotation_matrix):
 
 
 def apply_transformations_from_file(file_no, obj, mesh_name, character_name):
-    rotation_json_file_path = f'C:/dev/workspaces/python/urban chaos research/output/body-part-offsets/{character_name}/rotation_matrix_frame {file_no}.json'
+    rotation_json_file_path = f'C:/dev/workspaces/python/repo/UrbanChaosUtils/output/body-part-offsets/{character_name}/rotation_matrix_frame {file_no}.json'
     # Read the JSON file and store it in a dictionary
     rotation_dict = read_json_to_dict(rotation_json_file_path)
-    translation_json_file_path = f'C:/dev/workspaces/python/urban chaos research/output/body-part-offsets/{character_name}/frame {file_no}.txt'
+    translation_json_file_path = f'C:/dev/workspaces/python/repo/UrbanChaosUtils/output/body-part-offsets/{character_name}/frame {file_no}.txt'
     transform_dict = read_json_to_dict(translation_json_file_path)
 
     for key, value in rotation_dict.items():
@@ -159,6 +159,10 @@ def apply_transformations_from_file(file_no, obj, mesh_name, character_name):
 
             # Apply the transformation to the object's matrix_world
             obj.matrix_world = transformation_matrix
+
+            print(file_no)
+            obj.keyframe_insert(data_path='location', frame=file_no)
+            obj.keyframe_insert(data_path='rotation_euler', frame=file_no)
 
 
 def calculate_relative_transformation(initial_matrix, current_matrix):
@@ -239,9 +243,11 @@ def extract_current_pose_to_vue(frame_no, output_filepath):
                 apply_rotation_to_object(obj, rotation_90_x)
 
 
-def do_import(keyframe_no, character_name):
+def do_import(keyframes_list, character_name, model_id):
     # Example usage
-    base_obj_directory = 'C:/dev/workspaces/python/urban chaos research/output/all-obj/roper/0/'
+    base_obj_directory = f'C:/dev/workspaces/python/repo/UrbanChaosUtils/output/all-obj/{character_name}/{model_id}/'
+
+    print(base_obj_directory)
 
     # Check if mesh should be ignored
     ignored_list = ["rhand01", "rhand03", "rhand04", "rhand06", "rhand07", "lhand01", "lhand02"]
@@ -266,22 +272,23 @@ def do_import(keyframe_no, character_name):
             # Store the initial transformation matrix
             initial_matrix = get_transformation_matrix(imported_object)
 
-            # Apply transformations
-            apply_transformations_from_file(keyframe_no, imported_object, imported_object.name, character_name)
-            #        apply_transformations(imported_object)
+            for keyframe_no in keyframes_list:
+                # Apply transformations
+                apply_transformations_from_file(keyframe_no, imported_object, imported_object.name, character_name)
+                #        apply_transformations(imported_object)
 
-            # Get the current transformation matrix
-            current_matrix = get_transformation_matrix(imported_object)
+                # Get the current transformation matrix
+                current_matrix = get_transformation_matrix(imported_object)
 
-            # Calculate the relative transformation
-            relative_matrix = calculate_relative_transformation(initial_matrix, current_matrix)
+                # Calculate the relative transformation
+                relative_matrix = calculate_relative_transformation(initial_matrix, current_matrix)
 
-            # Extract translation and rotation from the relative matrix
-            translation = relative_matrix.to_translation()
-            rotation = relative_matrix.to_euler('XYZ')
+                # Extract translation and rotation from the relative matrix
+                translation = relative_matrix.to_translation()
+                rotation = relative_matrix.to_euler('XYZ')
 
-            # Convert rotation angles from radians to degrees
-            rotation_degrees = [math.degrees(angle) for angle in rotation]
+                # Convert rotation angles from radians to degrees
+                rotation_degrees = [math.degrees(angle) for angle in rotation]
 
 
 #            print(f"Initial matrix: {initial_matrix}")
@@ -291,7 +298,10 @@ def do_import(keyframe_no, character_name):
 #            print(f"Relative rotation (in degrees): {rotation_degrees}")
 #        print_coordinates(imported_object)
 if __name__ == '__main__':
-    do_import(454, 'darci1')
+    keyframes_list = list(range(19))
+    model_id = 0
+    model_name = 'van'
+    do_import(keyframes_list, model_name, model_id)
 
 #    extract_current_pose_to_vue(414)
 #    kfs_ids = [131, 132, 133, 134, 135, 136, 137]
