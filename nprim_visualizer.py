@@ -207,7 +207,9 @@ def export_to_obj_format(filename, nprim_name, df_points, df_quadrangles, df_tri
             l6 = "Ni 1.450000\n"
             l7 = "d 1.000000\n"
             l8 = f"illum 1\n"
-            map_Kd = f"map_Kd C:/Games/Urban Chaos/server/textures/shared/prims/tex{key:03d}hi.tga\n"
+            # map_Kd = f"map_Kd C:/Games/Urban Chaos/server/textures/shared/prims/tex{key:03d}hi.tga\n"
+            # map_Kd = f"map_Kd C:/Games/Urban Chaos/server/textures/shared/prims/tex{key:03d}hi.tga\n"
+            map_Kd = f"map_Kd C:/UC_PROTOTYPE/UrbanChaos/server/textures/shared/prims/tex{key:03d}.tga\n"
             output_material_file.writelines([l1, l2, l3, l4, l5, l6, l7, l8, map_Kd])
 
 
@@ -688,6 +690,10 @@ def app():
         # nprims_directory = 'res/nprims/'
         for filename in glob.iglob(f'{nprims_directory}/*.prm'):
             print(filename)
+            if filename == 'res/nprims/prototype\prim046.prm' or filename == 'res/nprims/prototype\prim080.prm'\
+                    or filename == 'res/nprims/prototype\prim105.prm' or filename == 'res/nprims/prototype\prim106.prm'\
+                    or filename == 'res/nprims/prototype\prim131.prm' or filename == 'res/nprims/prototype\prim132.prm':
+                continue
             [df, df_points, df_quadrangles, df_triangles] = fill_dataframe_with_nprim_data(filename, df)
             nprim_name = (df['name'].to_string(index=False, header=False))
             export_to_obj_format(filename, nprim_name, df_points, df_quadrangles, df_triangles)

@@ -22,7 +22,10 @@ def grab_dst_textures(obj_filepath):
 
 
 def extract_texture_number_from_texture_filename(texture_filename):
-    return int(texture_filename[-8:-5])
+    if texture_filename[-7:-5] == "hi":
+        return int(texture_filename[-10:-7])
+    else:
+        return int(texture_filename[-8:-5])
     # return int(texture_filename[-9:-6])
     # return int(texture_filename[-10:-7])
 

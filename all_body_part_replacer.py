@@ -802,11 +802,11 @@ def apply_multiple_body_parts():
     #               keys[8]: 1.3,
     #               }
 
-    input_all_filename = "anim003.all"
+    input_all_filename = "anim009.all"
 
-    keys = ["wiz8_demonhead.obj"]
+    keys = ["frame.obj"]
 
-    input_dict = {keys[0]: "head",
+    input_dict = {keys[0]: "frame",
                   }
 
     scale_dict = {keys[0]: 1.0
@@ -815,7 +815,7 @@ def apply_multiple_body_parts():
     # wiz8_demonhead.obj
 
     for key, value in input_dict.items():
-        input_obj = f'res/objs/{key}'
+        input_obj = f'res/objs/bike_fixed/{key}'
         body_part_name = value
         scale = scale_dict[key]
         app(input_all_filename, input_obj, body_part_name, scale)

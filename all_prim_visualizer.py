@@ -182,9 +182,20 @@ def export_to_obj_format_with_uvs(filename, nprim_name, vertices, df_quadrangles
             l6 = "Ni 1.450000\n"
             l7 = "d 1.000000\n"
             l8 = f"illum 1\n"
-            absolute_texture_path = "C:/Games/Urban Chaos/server/textures/shared/" + texture_page_per_material[key]
+            #absolute_texture_path = "C:/Games/Urban Chaos/server/textures/shared/" + texture_page_per_material[key]
+            absolute_texture_path = "C:/UC_PROTOTYPE/UrbanChaos/server/textures/shared/" + texture_page_per_material[key]
             # map_Kd = f"map_Kd C:/Games/Urban Chaos/server/textures/shared/people/tex{key:03d}hi.tga\n"
-            map_Kd = f"map_Kd {absolute_texture_path}/tex{key:03d}hi.tga\n"
+
+            fname = f'{absolute_texture_path}/tex{key:03d}hi.tga'
+            low_res_fname = f'{absolute_texture_path}/tex{key:03d}.tga'
+            if os.path.isfile(fname):
+                map_Kd = f"map_Kd {absolute_texture_path}/tex{key:03d}hi.tga\n"
+            elif os.path.isfile(low_res_fname):
+                map_Kd = f"map_Kd {absolute_texture_path}/tex{key:03d}.tga\n"
+            else:
+                print('oh oh! panic mode')
+                absolute_texture_path = "C:/UC_PROTOTYPE/UrbanChaos/server/textures/shared/people2"
+                map_Kd = f"map_Kd {absolute_texture_path}/tex{key:03d}.tga\n"
 
             output_material_file.writelines([l1, l2, l3, l4, l5, l6, l7, l8, map_Kd])
 
@@ -756,12 +767,13 @@ def grab_all_files_as_list(dir_path):
 def app():
     # binary_data = read_nprim("pzi_prim337.pzi")
     # binary_data = read_nprim("all/DARCI1.all")
-    all_filename_list = (grab_all_files_as_list("res/all/"))
+    # all_filename_list = (grab_all_files_as_list("res/all/"))
     # all_filename_list = ["banesuit.all"]
-    all_filename_list = ["anim003.all"]
+    all_filename_list = ["CIVVY.all"]
 
     # all_filename = "anim002.all"
     for all_filename in all_filename_list:
+        print(all_filename)
         # all_filename = "DARCI1.all"
         binary_data = read_nprim("res/all/" + all_filename)
         # binary_data = read_nprim("all/anim001.all")
