@@ -26,6 +26,9 @@ class PrimFormat(Enum):
     PRIM = 2
 
 
+texture_set = set()
+
+
 def determine_file_format(filename):
     """
     Determines the file format based on the filename.
@@ -62,7 +65,7 @@ def export_to_obj_format(filename, nprim_name, df_points, df_quadrangles, df_tri
     # Path(filename).stem
     # file_wo_ext = os.path.splitext(filename)[0] + "/out/" + filename + ".obj"
     texture_file_numbers = []
-    output_filename = "output/objs/" + Path(filename).stem + "-" + nprim_name + '.obj'
+    output_filename = "output/objs/retail/" + Path(filename).stem + "-" + nprim_name + '.obj'
     output_filename = output_filename.replace('\\r', '')
     uv_set = []
     uv_full_set = []
@@ -193,7 +196,7 @@ def export_to_obj_format(filename, nprim_name, df_points, df_quadrangles, df_tri
             for f_line in faces_lines:
                 output_file.write(f_line)
 
-    output_material_filename = "output/objs/" + Path(filename).stem + "-" + nprim_name + '.mtl'
+    output_material_filename = "output/objs/retail/" + Path(filename).stem + "-" + nprim_name + '.mtl'
     output_material_filename = output_material_filename.replace('\\r', '')
     with open(output_material_filename, "w") as output_material_file:
         for key, value in lines_per_material.items():
@@ -208,8 +211,9 @@ def export_to_obj_format(filename, nprim_name, df_points, df_quadrangles, df_tri
             l7 = "d 1.000000\n"
             l8 = f"illum 1\n"
             # map_Kd = f"map_Kd C:/Games/Urban Chaos/server/textures/shared/prims/tex{key:03d}hi.tga\n"
-            # map_Kd = f"map_Kd C:/Games/Urban Chaos/server/textures/shared/prims/tex{key:03d}hi.tga\n"
-            map_Kd = f"map_Kd C:/UC_PROTOTYPE/UrbanChaos/server/textures/shared/prims/tex{key:03d}.tga\n"
+            map_Kd = f"map_Kd C:/Games/Urban Chaos/server/textures/shared/prims/tex{key:03d}hi.tga\n"
+            texture_set.add(map_Kd)
+            # map_Kd = f"map_Kd C:/UC_PROTOTYPE/UrbanChaos/server/textures/shared/prims/tex{key:03d}.tga\n"
             output_material_file.writelines([l1, l2, l3, l4, l5, l6, l7, l8, map_Kd])
 
 
@@ -667,7 +671,7 @@ def app():
     # for p in prims_filenames:
     # nprim = "res/nprims/nprim058.prm"
 
-    nprim = "res/nprims/prim046.prm"
+    nprim = "res/nprims/retail/prim138.prm"
 
 
     # nprim = "res/nprims/nprim216.prm" # switch
@@ -678,7 +682,7 @@ def app():
     # nprim = "res/nprims/nprim162.prm" # stopsign
     # nprim = "res/nprims/nprim143.prm" # gun
     # nprim = "res/nprims/nprim036.prm" #
-    single_nprm = False
+    single_nprm = True
     # calc_uvs(105, 47, 98, 38, 119, 47, 126, 38)
     if single_nprm:
         [df, df_points, df_quadrangles, df_triangles] = fill_dataframe_with_nprim_data(nprim, df)
@@ -686,17 +690,19 @@ def app():
         export_to_obj_format(nprim, nprim_name, df_points, df_quadrangles, df_triangles)
         gui(df, df_points, df_quadrangles, df_triangles)
     else:
-        nprims_directory = 'res/nprims/prototype/'
+        nprims_directory = 'res/nprims/retail/'
         # nprims_directory = 'res/nprims/'
         for filename in glob.iglob(f'{nprims_directory}/*.prm'):
             print(filename)
-            if filename == 'res/nprims/prototype\prim046.prm' or filename == 'res/nprims/prototype\prim080.prm'\
-                    or filename == 'res/nprims/prototype\prim105.prm' or filename == 'res/nprims/prototype\prim106.prm'\
-                    or filename == 'res/nprims/prototype\prim131.prm' or filename == 'res/nprims/prototype\prim132.prm':
-                continue
+            # if filename == 'res/nprims/prototype\prim046.prm' or filename == 'res/nprims/prototype\prim080.prm'\
+            #         or filename == 'res/nprims/prototype\prim105.prm' or filename == 'res/nprims/prototype\prim106.prm'\
+            #         or filename == 'res/nprims/prototype\prim131.prm' or filename == 'res/nprims/prototype\prim132.prm':
+            #     continue
             [df, df_points, df_quadrangles, df_triangles] = fill_dataframe_with_nprim_data(filename, df)
             nprim_name = (df['name'].to_string(index=False, header=False))
             export_to_obj_format(filename, nprim_name, df_points, df_quadrangles, df_triangles)
+
+    print(texture_set)
 
 
 if __name__ == '__main__':

@@ -802,11 +802,11 @@ def apply_multiple_body_parts():
     #               keys[8]: 1.3,
     #               }
 
-    input_all_filename = "anim009.all"
+    input_all_filename = "darci1.all"
 
-    keys = ["frame.obj"]
+    keys = ["ghostInTheShellMask.obj"]
 
-    input_dict = {keys[0]: "frame",
+    input_dict = {keys[0]: "skull00",
                   }
 
     scale_dict = {keys[0]: 1.0
@@ -815,7 +815,7 @@ def apply_multiple_body_parts():
     # wiz8_demonhead.obj
 
     for key, value in input_dict.items():
-        input_obj = f'res/objs/bike_fixed/{key}'
+        input_obj = f'res/objs/{key}'
         body_part_name = value
         scale = scale_dict[key]
         app(input_all_filename, input_obj, body_part_name, scale)
@@ -831,7 +831,7 @@ def grab_files_with_extension(directory, ext):
 
 def apply_multiple_body_parts_matching_names():
     input_all_filename = "darci1.all"
-    objs_dir = 'res/objs/whole-model-gta3/'
+    objs_dir = 'res/objs/ghostInTheShell/'
     # objs_dir = 'output/frames-per-anim-file/roper/tests/'
     ext = "*.obj"
     obj_list = grab_files_with_extension(objs_dir, ext)

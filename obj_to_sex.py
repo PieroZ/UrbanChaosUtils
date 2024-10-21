@@ -88,10 +88,10 @@ def grab_files_with_extension(directory, ext):
 
 
 def app():
-    obj_input_dir = "res/objs/whole-model-gta3/"
+    obj_input_dir = "res/objs/turret/"
     # obj_input_dir = "output/frames-per-anim-file/roper/tests/"
     # obj_input_dir = "res/objs/handmade/1/"
-    output_file = 'res/sex/gta3.sex'
+    output_file = 'res/sex/turret.sex'
 
     # obj_input_path = "output/frames-per-anim-file/RETAIL_DARCI1/1/pelvis00.obj"
 

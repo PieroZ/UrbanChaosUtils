@@ -14,6 +14,18 @@ import json
 
 texture_pack = "people"
 
+texture_set = set()
+
+
+def extract_from_third_last_slash(path):
+    # Split the string by slashes and remove the newline character if present
+    parts = path.strip().split('/')
+
+    # Join the last three parts to get the desired path
+    extracted_path = '/'.join(parts[-3:])
+
+    return extracted_path
+
 
 def export_to_obj_format_with_uvs(filename, nprim_name, vertices, df_quadrangles, df_triangles):
     # vertices = df_points[["x", "y", "z"]].to_string(index=False, header=False)
@@ -170,6 +182,8 @@ def export_to_obj_format_with_uvs(filename, nprim_name, vertices, df_quadrangles
     # output_material_filename = "output/baalrog/" + Path(filename).stem + '.mtl'
     output_material_filename = filename[:-4] + ".mtl"
     output_material_filename = output_material_filename.replace('\\r', '')
+
+
     with open(output_material_filename, "w") as output_material_file:
         for key, value in lines_per_material.items():
             material_line = f"\nnewmtl Material.{key}\n"
@@ -182,14 +196,14 @@ def export_to_obj_format_with_uvs(filename, nprim_name, vertices, df_quadrangles
             l6 = "Ni 1.450000\n"
             l7 = "d 1.000000\n"
             l8 = f"illum 1\n"
-            #absolute_texture_path = "C:/Games/Urban Chaos/server/textures/shared/" + texture_page_per_material[key]
+            # absolute_texture_path = "C:/Games/Urban Chaos/server/textures/shared/" + texture_page_per_material[key]
             absolute_texture_path = "C:/UC_PROTOTYPE/UrbanChaos/server/textures/shared/" + texture_page_per_material[key]
             # map_Kd = f"map_Kd C:/Games/Urban Chaos/server/textures/shared/people/tex{key:03d}hi.tga\n"
 
-            fname = f'{absolute_texture_path}/tex{key:03d}hi.tga'
+            fname = f'{absolute_texture_path}/tex{key:03d}.tga'
             low_res_fname = f'{absolute_texture_path}/tex{key:03d}.tga'
             if os.path.isfile(fname):
-                map_Kd = f"map_Kd {absolute_texture_path}/tex{key:03d}hi.tga\n"
+                map_Kd = f"map_Kd {absolute_texture_path}/tex{key:03d}.tga\n"
             elif os.path.isfile(low_res_fname):
                 map_Kd = f"map_Kd {absolute_texture_path}/tex{key:03d}.tga\n"
             else:
@@ -197,6 +211,8 @@ def export_to_obj_format_with_uvs(filename, nprim_name, vertices, df_quadrangles
                 absolute_texture_path = "C:/UC_PROTOTYPE/UrbanChaos/server/textures/shared/people2"
                 map_Kd = f"map_Kd {absolute_texture_path}/tex{key:03d}.tga\n"
 
+            texture_relative_path = extract_from_third_last_slash(map_Kd)
+            texture_set.add(texture_relative_path)
             output_material_file.writelines([l1, l2, l3, l4, l5, l6, l7, l8, map_Kd])
 
     # with open(output_material_filename, "w") as output_material_file:
@@ -216,6 +232,7 @@ def export_to_obj_format_with_uvs(filename, nprim_name, vertices, df_quadrangles
     #         map_Kd = f"map_Kd {absolute_texture_path}/tex{key:03d}hi.tga\n"
     #
     #         output_material_file.writelines([l1, l2, l3, l4, l5, l6, l7, l8, map_Kd])
+
 
 
 def write_obj_file(vertices, triangle_faces, quadrangle_faces, filename):
@@ -253,9 +270,9 @@ def convert_nprim_binary_to_readable_data(starting_point, next_prim_point, data)
 
     points = []
     for p_id in range(point_count):
-        x = np.int16(int.from_bytes(data[cursor:cursor+2], "little"))
-        y = np.int16(int.from_bytes(data[cursor+2:cursor+4], "little"))
-        z = np.int16(int.from_bytes(data[cursor+4:cursor+6], "little"))
+        x = np.array(int.from_bytes(data[cursor+0:cursor+2], "little")).astype(np.int16).item()
+        y = np.array(int.from_bytes(data[cursor+2:cursor+4], "little")).astype(np.int16).item()
+        z = np.array(int.from_bytes(data[cursor+4:cursor+6], "little")).astype(np.int16).item()
 
         cursor = cursor + 6
 
@@ -769,18 +786,23 @@ def app():
     # binary_data = read_nprim("all/DARCI1.all")
     # all_filename_list = (grab_all_files_as_list("res/all/"))
     # all_filename_list = ["banesuit.all"]
-    all_filename_list = ["CIVVY.all"]
+    all_filename_list = ["HERO.all"]
 
     # all_filename = "anim002.all"
     for all_filename in all_filename_list:
         print(all_filename)
         # all_filename = "DARCI1.all"
         binary_data = read_nprim("res/all/" + all_filename)
+        # binary_data = read_nprim("res/all/prototype-all/" + all_filename)
         # binary_data = read_nprim("all/anim001.all")
 
         cursor = 4
         [cursor, multiprims_count] = multiprim_count(cursor, binary_data)
         cursor = 8
+
+        if multiprims_count == 0:
+            multiprims_count = 1
+            cursor = 4
 
         for k in range(multiprims_count):
         # for k in range(1):
@@ -816,7 +838,17 @@ def app():
 
         load_insert_game_chunk(cursor, binary_data, all_filename, prims_count, names)
 
-        print(names)
+        formatted_names = ', '.join(names)
+
+        print(formatted_names)
+
+        # Join the elements of the set manually without single quotes
+        formatted_texture_set = ', '.join(texture_set)
+
+        # Print the result
+        print(f'texture_set={{{formatted_texture_set}}}')
+
+        # print(f'texture_set={texture_set}')
 
 
 def test_read_rotation_json():

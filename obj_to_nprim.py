@@ -23,11 +23,11 @@ class NprimModifier:
 
 
 def user_input(nprim_modifier):
-    nprim_modifier.new_first_global_point_id = 32000
-    nprim_modifier.new_first_quad_id = 26000
-    nprim_modifier.new_first_triangle_id = 25000
+    nprim_modifier.new_first_global_point_id = 1
+    nprim_modifier.new_first_quad_id = 1
+    nprim_modifier.new_first_triangle_id = 1
 
-    nprim_modifier.nprim_output_filename = 'nprim216.prm'
+    nprim_modifier.nprim_output_filename = 'nprim256.prm'
     nprim_modifier.nprim_output_path = 'output/modified_nprims/' + nprim_modifier.nprim_output_filename
     # nprim_modifier.nprim_output_path = 'output/modified_nprims/test_cube.prm'
 
@@ -268,7 +268,7 @@ def app():
     [df, df_points, df_quadrangles, df_triangles] = fill_dataframe_with_nprim_data(nprim, df)
 
     # user defined obj
-    [df_points, df_triangles, df_quadrangles] = extract_obj_to_df("res/objs/motorbike_handle_bar_137prim.obj")
+    [df_points, df_triangles, df_quadrangles] = extract_obj_to_df("res/objs/pistol_silencer.obj")
 
     triangle_faces_count = faces_count(df_triangles)
     quadrangle_faces_count = faces_count(df_quadrangles)
