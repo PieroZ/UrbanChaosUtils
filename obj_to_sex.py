@@ -1,5 +1,6 @@
 import os.path
 import glob
+import shutil
 
 
 def parse_obj(file_path):
@@ -54,7 +55,7 @@ def write_custom_format(file_path, vertices, texture_vertices, faces, materials,
                 f"Material: DiffuseRGB (0.5000,0.5000,0.5000), shininess 0.25, shinstr 0.05, Single sided, Filtered alpha, filename {material}.tga\n")
 
         for i, vertex in enumerate(vertices):
-            file.write(f"Vertex: ({vertex[0]:10.4f}, {vertex[1]:10.4f}, {vertex[2]:10.4f})\n")
+            file.write(f"Vertex: ({vertex[0]:10.4f}, {vertex[2]:10.4f}, {vertex[1]:10.4f})\n")
 
         for i, texture_vertex in enumerate(texture_vertices):
             file.write(f"Texture Vertex: ({texture_vertex[0]:10.4f}, {1+texture_vertex[1]:10.4f})\n")
@@ -88,10 +89,11 @@ def grab_files_with_extension(directory, ext):
 
 
 def app():
-    obj_input_dir = "res/objs/turret/"
+    obj_input_dir = "res/objs/pziTurret/"
     # obj_input_dir = "output/frames-per-anim-file/roper/tests/"
     # obj_input_dir = "res/objs/handmade/1/"
-    output_file = 'res/sex/turret.sex'
+    output_filename = 'turret.sex'
+    output_file = f'res/sex/{output_filename}'
 
     # obj_input_path = "output/frames-per-anim-file/RETAIL_DARCI1/1/pelvis00.obj"
 
@@ -104,6 +106,10 @@ def app():
         obj_input_path = f'{obj_input_dir}{obj}'
         convert_obj_to_custom_format(obj_input_path, output_file, obj[:-4])
 
+    sc_game_dir = 'C:/dev/workspaces/repo clones/Clean-UrbanChaos/MuckyFoot-UrbanChaos/fallen/Release/data/'
+    dst_file = sc_game_dir + output_filename
+
+    shutil.copyfile(output_file, dst_file)
     print('Sex is Done')
 
 

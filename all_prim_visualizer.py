@@ -749,7 +749,7 @@ def util_print(elements, body_parts):
         concated_string = concated_string + '"' + part + '": [' + str(elem.OffsetX) + ',' \
                           + str(elem.OffsetY) + ',' + str(elem.OffsetZ) + '],\n'
         cm = np.array([elem.CMatrix0, elem.CMatrix1, elem.CMatrix2], dtype=np.int32)
-        print(part)
+        # print(part)
         rotation_matrix = uc_matrix_utils.uncompress_matrix(cm)
 
         rotation_json_string = rotation_json_string + '"' + part + '": [' + str(rotation_matrix) + '],\n'
@@ -806,6 +806,7 @@ def app():
 
         for k in range(multiprims_count):
         # for k in range(1):
+            print(f'model_id ={k}')
             results_path = "output/all-obj/" + all_filename[:-4] + "/" + str(k)
             Path(results_path).mkdir(parents=True, exist_ok=True)
             [cursor, prims_count] = prim_count(cursor, binary_data)
