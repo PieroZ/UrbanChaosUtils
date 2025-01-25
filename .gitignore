@@ -1,2 +1,6 @@
 output/objs
 out/
+output/
+.idea/
+__pycache__/
+res/
