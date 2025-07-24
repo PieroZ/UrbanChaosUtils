@@ -1,6 +1,49 @@
 # UrbanChaosUtils
 Repo containing various scripts for Urban Chaos game.
 
+# 🔊 Speaker Classification and Transcript Viewer
+
+This project provides a lightweight toolset for:
+- Transcribing audio files with Whisper
+- Classifying speakers using unsupervised clustering
+- Browsing and renaming speaker labels in a GUI
+- Viewing associated transcripts
+
+## 🗂 Overview
+
+### `transcript_generator.py`
+Uses OpenAI's Whisper model to automatically generate transcripts for all audio files in a folder.
+
+- **Input:** `.wav`, `.mp3`, `.m4a`, etc.
+- **Output:** `.txt` transcript for each file
+- **Model:** Whisper (default = `base`, changeable)
+
+---
+
+### `classify_wavs.py`
+Clusters speaker embeddings using SpeechBrain and KMeans.
+
+- **Input:** Directory of `.wav` files
+- **Output:** A file (`klasyfikacja_mowcow.txt`) mapping each audio file to a predicted speaker label (`label_0`, `label_1`, ...)
+- **Requires:** `speechbrain`, `torchaudio`, `sklearn`
+
+---
+
+### `label_audio_player.py`
+
+<img width="1425" height="644" alt="image" src="https://github.com/user-attachments/assets/38f76d24-60a6-43e6-80dd-a4832855575a" />
+
+
+Interactive GUI to:
+- Browse audio by speaker label
+- Listen to individual clips
+- View transcripts
+- Rename labels (saved persistently in `label_names.json`)
+
+- **Dependencies:** `tkinter`, `pydub`, `simpleaudio`
+- **Supports:** Playback + transcript sync
+- **Extra:** Remembers your custom label names across sessions
+
 # 3D Model Viewer
 Tool used to convert nprim data to .obj & .mtl format as shown in:
 [https://youtu.be/sdvsI-QBcZ0 https://youtu.be/sdvsI-QBcZ0](https://youtu.be/sdvsI-QBcZ0)
