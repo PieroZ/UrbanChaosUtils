@@ -11,7 +11,7 @@ from collections import defaultdict
 
 AUDIO_DIR = Path("C:/vTemp/Urban Chaos/talk2/converted")
 TRANSCRIPT_DIR = Path("C:/vTemp/Urban Chaos/talk2/transcripts")
-LABELS_FILE = AUDIO_DIR / "klasyfikacja_mowcow.txt"
+LABELS_FILE = AUDIO_DIR / "speaker_labels.txt"
 LABEL_NAMES_FILE = AUDIO_DIR / "label_names.json"
 
 
