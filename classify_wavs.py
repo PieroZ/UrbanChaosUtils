@@ -26,20 +26,19 @@ if __name__ == '__main__':
             signal, sr = torchaudio.load(wav_file)
             duration = signal.shape[1] / sr
             if duration < MIN_DURATION_SEC:
-                print(f"⏭ Pominięto (za krótki): {wav_file.name}")
+                print(f"⏭ Skipped (too short): {wav_file.name}")
                 continue
 
-            # Przekazujemy załadowany sygnał zamiast ścieżki
             emb = recognizer.encode_batch(signal)
             embeddings.append(emb.squeeze().cpu().numpy())
             file_paths.append(wav_file.name)
-            print(f"✅ {wav_file.name}")
+            print(f"✅ Processed: {wav_file.name}")
 
         except Exception as e:
-            print(f"❌ {wav_file.name}: {e}")
+            print(f"❌ Error processing {wav_file.name}: {e}")
 
     if len(embeddings) < 2:
-        raise RuntimeError("Za mało plików audio do klasteryzacji.")
+        raise RuntimeError("Not enough audio files for clustering.")
 
     X = np.stack(embeddings)
     n_clusters = min(10, len(X))
@@ -50,4 +49,4 @@ if __name__ == '__main__':
         for fname, label in zip(file_paths, labels):
             f.write(f"{fname} -> label_{label}\n")
 
-    print(f"\n📄 Wyniki zapisane do: {OUTPUT_FILE}")
+    print(f"\n📄 Results saved to: {OUTPUT_FILE}")
