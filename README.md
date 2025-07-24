@@ -24,7 +24,7 @@ Uses OpenAI's Whisper model to automatically generate transcripts for all audio 
 Clusters speaker embeddings using SpeechBrain and KMeans.
 
 - **Input:** Directory of `.wav` files
-- **Output:** A file (`klasyfikacja_mowcow.txt`) mapping each audio file to a predicted speaker label (`label_0`, `label_1`, ...)
+- **Output:** A file (`speaker_labels.txt`) mapping each audio file to a predicted speaker label (`label_0`, `label_1`, ...)
 - **Requires:** `speechbrain`, `torchaudio`, `sklearn`
 
 ---
