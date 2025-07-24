@@ -30,6 +30,10 @@ Clusters speaker embeddings using SpeechBrain and KMeans.
 ---
 
 ### `label_audio_player.py`
+
+<img width="1425" height="644" alt="image" src="https://github.com/user-attachments/assets/38f76d24-60a6-43e6-80dd-a4832855575a" />
+
+
 Interactive GUI to:
 - Browse audio by speaker label
 - Listen to individual clips
